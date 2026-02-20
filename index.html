@@ -6,59 +6,112 @@
     <title>SnowFans - 專屬雪友的開源互助平台</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 md:py-24">
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 md:py-16">
     
     <div class="max-w-4xl w-full space-y-12 text-center">
         
-        <div class="space-y-4">
+        <div class="space-y-4 mt-8">
             <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
-                🏂 SnowFans <span class="text-blue-500">(籌備中)</span>
+                🏂 SnowFans <span class="text-blue-500 text-3xl align-top">(籌備中)</span>
             </h1>
             <p class="text-xl md:text-2xl text-slate-400 font-medium">
                 專屬雪友的開源互助資源平台
             </p>
         </div>
 
+        <div class="flex flex-col items-center justify-center space-y-2 py-6 border-y border-slate-800/60">
+            <span class="text-xs font-bold text-slate-500 tracking-widest uppercase">Server Hosted & Sponsored By</span>
+            <div class="flex items-center gap-2 text-2xl font-bold text-white hover:text-purple-400 transition-colors cursor-default">
+                <span class="text-purple-500">▲</span> Zeabur
+            </div>
+            <p class="text-sm text-slate-400">感謝台灣神級 PaaS 平台 Zeabur 贊助極速伺服器基礎設施</p>
+        </div>
+
         <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl text-left space-y-6 shadow-xl">
             <h2 class="text-2xl font-bold text-white border-b border-slate-700 pb-4">
                 受夠了散落各地的滑雪農場文？我們決定自己開源寫一個！
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg text-slate-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg text-slate-300">
                 <div class="flex items-start mt-2">
-                    <span class="mr-3 text-xl">🤝</span>
+                    <span class="mr-3 text-2xl">🤝</span>
                     <div><strong class="text-white">透明教練媒合：</strong><br><span class="text-base text-slate-400">實名證照把關，學生教練直接聯繫，平台 0 抽成。</span></div>
                 </div>
                 <div class="flex items-start mt-2">
-                    <span class="mr-3 text-xl">♻️</span>
+                    <span class="mr-3 text-2xl">♻️</span>
                     <div><strong class="text-white">二手裝備交易：</strong><br><span class="text-base text-slate-400">雪友專屬的跳蚤市場與安心代購防坑指南。</span></div>
                 </div>
                 <div class="flex items-start mt-2">
-                    <span class="mr-3 text-xl">🏠</span>
+                    <span class="mr-3 text-2xl">🏠</span>
                     <div><strong class="text-white">住宿租借地圖：</strong><br><span class="text-base text-slate-400">嚴選高 CP 值背包客棧與優良雪具店真實評價。</span></div>
                 </div>
                 <div class="flex items-start mt-2">
-                    <span class="mr-3 text-xl">🌍</span>
+                    <span class="mr-3 text-2xl">🌍</span>
                     <div><strong class="text-white">維基共筆攻略：</strong><br><span class="text-base text-slate-400">打破日韓紅海，首創「歐美夢幻雪場拓荒指南」。</span></div>
                 </div>
             </div>
         </div>
 
         <div class="text-left space-y-6">
+            <h2 class="text-2xl font-bold text-white border-b border-slate-800 pb-4 flex items-center gap-2">
+                <span>⚔️ 三大核心戰隊 (Our Teams)</span>
+            </h2>
+            <p class="text-slate-400">我們採用開源協作與無老闆的民主自治模式，依照專長分為三大核心小組，並定期輪替小組長：</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="bg-blue-950/20 p-6 rounded-xl border border-blue-900/40 hover:border-blue-700/60 transition-colors">
+                    <h3 class="font-bold text-blue-400 text-lg mb-2">💻 網站技術與開發組</h3>
+                    <ul class="text-slate-300 text-sm space-y-2 list-disc list-inside">
+                        <li>Next.js 前端介面開發</li>
+                        <li>Supabase 資料庫架構</li>
+                        <li>PWA 離線功能實作</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-blue-900/30">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">徵求神隊友</p>
+                        <p class="text-blue-200 text-sm">前端/後端工程師、Web 開發者</p>
+                    </div>
+                </div>
+                <div class="bg-pink-950/20 p-6 rounded-xl border border-pink-900/40 hover:border-pink-700/60 transition-colors">
+                    <h3 class="font-bold text-pink-400 text-lg mb-2">🎨 產品設計與內容組</h3>
+                    <ul class="text-slate-300 text-sm space-y-2 list-disc list-inside">
+                        <li>UI/UX 設計與產品企劃</li>
+                        <li>歐美/日韓雪場攻略撰寫</li>
+                        <li>平台視覺規範定調</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-pink-900/30">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">徵求神隊友</p>
+                        <p class="text-pink-200 text-sm">UI/UX 設計師、文字創作者</p>
+                    </div>
+                </div>
+                <div class="bg-emerald-950/20 p-6 rounded-xl border border-emerald-900/40 hover:border-emerald-700/60 transition-colors">
+                    <h3 class="font-bold text-emerald-400 text-lg mb-2">📣 社群營運與推廣組</h3>
+                    <ul class="text-slate-300 text-sm space-y-2 list-disc list-inside">
+                        <li>教練/裝備資格審核把關</li>
+                        <li>社群媒體經營與宣傳</li>
+                        <li>跨界專業專欄策劃</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-emerald-900/30">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">徵求神隊友</p>
+                        <p class="text-emerald-200 text-sm">行銷企劃、資深雪友、各界專家</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-left space-y-6">
             <h2 class="text-2xl font-bold text-white border-b border-slate-800 pb-4">
-                🏗️ 我們的網站架構 (Tech Stack)
+                🏗️ 網站基礎架構 (Tech Stack)
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
                     <h3 class="font-bold text-white text-lg mb-2">⚛️ 前端與 PWA</h3>
-                    <p class="text-slate-400 text-sm">Next.js (React) + Tailwind CSS。支援離線快取，讓雪友在無網的雪山環境也能查看攻略。</p>
+                    <p class="text-slate-400 text-sm">Next.js (React) + Tailwind CSS。支援離線快取。</p>
                 </div>
-                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
                     <h3 class="font-bold text-white text-lg mb-2">🗄️ 後端與資料庫</h3>
-                    <p class="text-slate-400 text-sm">Supabase (PostgreSQL)。強大的開源 Firebase 替代方案，完美支援共筆系統與權限控管。</p>
+                    <p class="text-slate-400 text-sm">Supabase (PostgreSQL)。完美支援共筆與權限控管。</p>
                 </div>
-                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
                     <h3 class="font-bold text-white text-lg mb-2">🚀 部署與託管</h3>
-                    <p class="text-slate-400 text-sm">Zeabur。台灣團隊打造的神級 PaaS，提供極速 CI/CD 與 PR 預覽環境，降低溝通成本。</p>
+                    <p class="text-slate-400 text-sm">Zeabur。提供極速 CI/CD 與 PR 預覽環境。</p>
                 </div>
             </div>
         </div>

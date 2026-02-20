@@ -6,9 +6,10 @@
     <title>SnowFans - 專屬雪友的開源互助平台</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 md:p-24">
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 md:py-24">
     
-    <div class="max-w-3xl w-full space-y-8 text-center">
+    <div class="max-w-4xl w-full space-y-12 text-center">
+        
         <div class="space-y-4">
             <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
                 🏂 SnowFans <span class="text-blue-500">(籌備中)</span>
@@ -22,29 +23,88 @@
             <h2 class="text-2xl font-bold text-white border-b border-slate-700 pb-4">
                 受夠了散落各地的滑雪農場文？我們決定自己開源寫一個！
             </h2>
-            <ul class="space-y-3 text-lg text-slate-300">
-                <li class="flex items-center">🤝 <span class="ml-3"><strong>透明教練媒合：</strong> 實名證照把關，平台 0 抽成。</span></li>
-                <li class="flex items-center">♻️ <span class="ml-3"><strong>二手裝備交易：</strong> 雪友專屬跳蚤市場與代購防坑。</span></li>
-                <li class="flex items-center">🏠 <span class="ml-3"><strong>住宿租借地圖：</strong> 嚴選背包客棧與雪具店真實評價。</span></li>
-                <li class="flex items-center">🌍 <span class="ml-3"><strong>維基共筆攻略：</strong> 首創「歐美夢幻雪場拓荒指南」。</span></li>
-            </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg text-slate-300">
+                <div class="flex items-start mt-2">
+                    <span class="mr-3 text-xl">🤝</span>
+                    <div><strong class="text-white">透明教練媒合：</strong><br><span class="text-base text-slate-400">實名證照把關，學生教練直接聯繫，平台 0 抽成。</span></div>
+                </div>
+                <div class="flex items-start mt-2">
+                    <span class="mr-3 text-xl">♻️</span>
+                    <div><strong class="text-white">二手裝備交易：</strong><br><span class="text-base text-slate-400">雪友專屬的跳蚤市場與安心代購防坑指南。</span></div>
+                </div>
+                <div class="flex items-start mt-2">
+                    <span class="mr-3 text-xl">🏠</span>
+                    <div><strong class="text-white">住宿租借地圖：</strong><br><span class="text-base text-slate-400">嚴選高 CP 值背包客棧與優良雪具店真實評價。</span></div>
+                </div>
+                <div class="flex items-start mt-2">
+                    <span class="mr-3 text-xl">🌍</span>
+                    <div><strong class="text-white">維基共筆攻略：</strong><br><span class="text-base text-slate-400">打破日韓紅海，首創「歐美夢幻雪場拓荒指南」。</span></div>
+                </div>
+            </div>
         </div>
 
-        <div class="space-y-6 pt-8">
-            <h3 class="text-2xl font-bold text-white">🚀 神隊友熱血招募中！</h3>
+        <div class="text-left space-y-6">
+            <h2 class="text-2xl font-bold text-white border-b border-slate-800 pb-4">
+                🏗️ 我們的網站架構 (Tech Stack)
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                    <h3 class="font-bold text-white text-lg mb-2">⚛️ 前端與 PWA</h3>
+                    <p class="text-slate-400 text-sm">Next.js (React) + Tailwind CSS。支援離線快取，讓雪友在無網的雪山環境也能查看攻略。</p>
+                </div>
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                    <h3 class="font-bold text-white text-lg mb-2">🗄️ 後端與資料庫</h3>
+                    <p class="text-slate-400 text-sm">Supabase (PostgreSQL)。強大的開源 Firebase 替代方案，完美支援共筆系統與權限控管。</p>
+                </div>
+                <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 hover:border-slate-600 transition-colors">
+                    <h3 class="font-bold text-white text-lg mb-2">🚀 部署與託管</h3>
+                    <p class="text-slate-400 text-sm">Zeabur。台灣團隊打造的神級 PaaS，提供極速 CI/CD 與 PR 預覽環境，降低溝通成本。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-left space-y-6">
+            <h2 class="text-2xl font-bold text-white border-b border-slate-800 pb-4 flex items-center justify-between">
+                <span>🏆 貢獻者英雄榜 (Hall of Fame)</span>
+            </h2>
+            <p class="text-slate-400">專案剛啟動，英雄榜正虛位以待！只要成功合併一個 PR、畫一張設計圖，或貢獻一篇攻略，你的名字與連結將永久保留於此。</p>
+            
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="https://github.com/s3206brian" target="_blank" class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 p-3 pr-5 rounded-full border border-slate-700 transition-colors cursor-pointer shadow-lg">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">B</div>
+                    <div>
+                        <div class="text-white font-bold text-sm">s3206brian</div>
+                        <div class="text-indigo-400 text-xs">發起人 / 全端</div>
+                    </div>
+                </a>
+
+                <div class="flex items-center gap-3 bg-slate-900/80 border border-dashed border-slate-600 p-3 pr-5 rounded-full opacity-80">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 font-bold">?</div>
+                    <div>
+                        <div class="text-slate-300 font-bold text-sm">下一位神隊友</div>
+                        <div class="text-slate-500 text-xs">等你來卡位！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-indigo-950/30 border border-indigo-900/50 p-8 rounded-2xl space-y-6 mt-8">
+            <h3 class="text-2xl font-bold text-white">🚀 準備好加入我們了嗎？</h3>
             <p class="text-slate-400">
-                不管你是工程師、設計師、還是滑雪狂熱份子，點擊下方按鈕加入我們的線上總部！
+                我們不發薪水，但我們提供一個擁有真實用戶痛點、準備迎接龐大流量的超強 Side Project 舞台！<br>
+                點擊下方按鈕加入我們的線上總部，一起把這個酷東西做出來！
             </p>
             
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <a href="https://discord.gg/GY7K97pf" target="_blank" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full shadow-lg flex items-center gap-2">
+                <a href="https://discord.gg/GY7K97pf" target="_blank" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full shadow-lg hover:shadow-indigo-500/50 transition-all duration-200 flex items-center gap-2">
                     💬 點擊加入 Discord 志工總部
                 </a>
-                <a href="https://github.com/s3206brian/snowfans" target="_blank" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-full border border-slate-700 flex items-center gap-2">
+                <a href="https://github.com/s3206brian/snowfans" target="_blank" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-full border border-slate-700 transition-all duration-200 flex items-center gap-2">
                     🐙 前往 GitHub 專案大本營
                 </a>
             </div>
         </div>
+
     </div>
 
 </body>

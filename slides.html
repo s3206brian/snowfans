@@ -7,17 +7,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; overflow: hidden; font-family: sans-serif; }
-        .slide { display: none; height: 100vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; animation: fadeIn 0.5s ease-in-out; }
+        .slide { display: none; height: 100vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; animation: fadeIn 0.4s ease-in-out; }
         .slide.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         ul { text-align: left; display: inline-block; }
         li { margin-bottom: 1rem; }
+        
+        /* 底部導覽列樣式 */
+        .nav-controls { position: fixed; bottom: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 50; }
+        .nav-btn { background-color: #1e293b; color: white; border: 1px solid #334155; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .nav-btn:hover { background-color: #3b82f6; border-color: #60a5fa; transform: translateY(-2px); }
+        .nav-btn:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <div class="absolute top-4 right-4 text-slate-500 text-sm">
-        按 <kbd class="bg-slate-800 px-2 py-1 rounded">空白鍵</kbd> 或 <kbd class="bg-slate-800 px-2 py-1 rounded">➡</kbd> 下一頁
+    <div class="nav-controls">
+        <button id="prevBtn" class="nav-btn" onclick="prevSlide()">⬅️ 上一頁</button>
+        <button id="nextBtn" class="nav-btn" onclick="nextSlide()">下一頁 ➡️</button>
+    </div>
+
+    <div class="absolute top-4 left-4 text-slate-500 text-sm">
+        按 <kbd class="bg-slate-800 px-2 py-1 rounded">⬅</kbd> <kbd class="bg-slate-800 px-2 py-1 rounded">➡</kbd> 也可以切換
     </div>
 
     <div class="slide active" id="slide-0">
@@ -30,10 +41,10 @@
         <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">📝 今日議程 (Agenda)</h2>
         <ul class="text-3xl text-slate-300 space-y-6">
             <li>1️⃣ 破冰相見歡 (Ice Breaking)</li>
-            <li>2️⃣ 為什麼我們要做 SnowFans？ (The Why)</li>
+            <li>2️⃣ 網站解決痛點與願景 (The Why)</li>
             <li>3️⃣ 網站架構與技術火力 (The How)</li>
             <li>4️⃣ 三大戰隊與任務認領 (The Teams)</li>
-            <li>5️⃣ 推舉初代小組長 (Team Leads)</li>
+            <li>5️⃣ 推舉核心幹部與小組長 (Elections)</li>
             <li>6️⃣ 自由 Q&A 交流 (Let's Chat!)</li>
         </ul>
     </div>
@@ -51,119 +62,18 @@
     </div>
 
     <div class="slide" id="slide-3">
-        <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">❓ 為什麼需要 SnowFans？</h2>
-        <div class="grid grid-cols-2 gap-12 max-w-6xl w-full">
-            <div class="bg-red-950/30 p-8 rounded-2xl border border-red-900/50">
-                <h3 class="text-3xl font-bold text-red-400 mb-6">現有痛點</h3>
-                <ul class="text-2xl text-slate-300 space-y-4 list-disc list-inside">
-                    <li>資訊散落各地、農場文太多</li>
-                    <li>教練平台抽成過高、不透明</li>
-                    <li>裝備交易充滿詐騙</li>
-                    <li>歐美雪場缺乏中文攻略</li>
+        <h2 class="text-5xl font-bold text-white mb-10 border-b border-slate-700 pb-4">🎯 我們要解決什麼痛點？</h2>
+        <div class="grid grid-cols-2 gap-8 max-w-7xl w-full">
+            <div class="bg-blue-950/30 p-8 rounded-2xl border border-blue-900/50 text-left">
+                <h3 class="text-4xl font-bold text-blue-400 mb-6 flex items-center gap-3">👨‍🏫 使用對象：教練</h3>
+                <ul class="text-2xl text-slate-300 space-y-5 list-disc list-inside">
+                    <li><strong class="text-white">整合教學前置準備：</strong> 系統化管理學生資訊與教學進度。</li>
+                    <li><strong class="text-white">主動釋出空檔：</strong> 教練發布「可教學時間與地點」，讓學生主動預約選購。</li>
+                    <li><strong class="text-white">社群需求爬蟲系統：</strong> 平台自動去社群爬取學生的「求教練文」，精準推播配對！</li>
                 </ul>
             </div>
-            <div class="bg-emerald-950/30 p-8 rounded-2xl border border-emerald-900/50">
-                <h3 class="text-3xl font-bold text-emerald-400 mb-6">我們的願景</h3>
-                <ul class="text-2xl text-slate-300 space-y-4 list-disc list-inside">
-                    <li>非營利、無抽成、絕對透明</li>
-                    <li>維基百科式共筆協作</li>
-                    <li>建立健康互助的雪友生態圈</li>
-                    <li>成為大家職涯履歷上的亮點！</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="slide" id="slide-4">
-        <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">🏗️ 我們的技術火力 (Tech Stack)</h2>
-        <ul class="text-3xl text-slate-300 space-y-8 list-none text-center">
-            <li>⚛️ <strong class="text-white">前端：</strong> Next.js + Tailwind CSS (支援 PWA)</li>
-            <li>🗄️ <strong class="text-white">資料庫：</strong> Supabase (開源的 Firebase 替代方案)</li>
-            <li>🚀 <strong class="text-white">伺服器：</strong> Zeabur 官方贊助極速節點！</li>
-            <li>⚖️ <strong class="text-white">版權保護：</strong> AGPLv3 開源授權，保護心血</li>
-        </ul>
-    </div>
-
-    <div class="slide" id="slide-5">
-        <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">⚔️ 尋找你的戰鬥位置 (三大戰隊)</h2>
-        <div class="flex gap-6 max-w-6xl w-full text-left">
-            <div class="flex-1 bg-blue-900/20 p-6 rounded-xl border border-blue-800 text-xl">
-                <h3 class="text-2xl font-bold text-blue-400 mb-4">💻 網站技術與開發組</h3>
-                <p class="text-slate-300">前端切版、資料庫串接、PWA 離線功能</p>
-            </div>
-            <div class="flex-1 bg-pink-900/20 p-6 rounded-xl border border-pink-800 text-xl">
-                <h3 class="text-2xl font-bold text-pink-400 mb-4">🎨 設計與內容共筆組</h3>
-                <p class="text-slate-300">UI/UX 規範、歐美攻略撰寫、資料建檔</p>
-            </div>
-            <div class="flex-1 bg-emerald-900/20 p-6 rounded-xl border border-emerald-800 text-xl">
-                <h3 class="text-2xl font-bold text-emerald-400 mb-4">📣 社群營運與推廣組</h3>
-                <p class="text-slate-300">防詐騙審核、社群企劃、專家專欄策劃</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="slide" id="slide-6">
-        <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">👑 推舉初代小組長 (Team Leads)</h2>
-        <div class="bg-slate-900 p-8 rounded-2xl border border-slate-700 max-w-4xl text-left">
-            <ul class="text-3xl text-slate-300 space-y-6 list-disc list-inside">
-                <li><strong class="text-yellow-400">任務：</strong> 不是當主管！而是當「跨組溝通橋樑」</li>
-                <li><strong class="text-yellow-400">條件：</strong> 常在線上、回覆快、熱心整理重點</li>
-                <li><strong class="text-yellow-400">機制：</strong> 定期輪替制，沒有上下級壓力</li>
-                <li><strong class="text-yellow-400">收穫：</strong> 寫在履歷上超加分的專案管理經驗！</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="slide" id="slide-7">
-        <h2 class="text-5xl font-bold text-white mb-12 border-b border-slate-700 pb-4">🚀 下一步行動 (Next Steps)</h2>
-        <ul class="text-3xl text-slate-300 space-y-8 list-decimal list-inside text-left inline-block">
-            <li>在 Discord 大廳完成自我介紹。</li>
-            <li>請管理員幫你掛上專屬的<strong class="text-indigo-400">「身分組顏色」</strong>。</li>
-            <li>工程師：去 GitHub Fork 專案並閱讀貢獻指南。</li>
-            <li>設計/內容/營運組：到專屬頻道領取首批任務！</li>
-        </ul>
-    </div>
-
-    <div class="slide" id="slide-8">
-        <h1 class="text-6xl md:text-8xl font-extrabold text-white mb-8">💬 Q & A</h1>
-        <p class="text-4xl text-blue-400 font-bold mb-12">Let's build something awesome!</p>
-        <p class="text-2xl text-slate-500">感謝大家的參與，任何天馬行空的想法都歡迎提出！</p>
-    </div>
-
-    <script>
-        // 簡易的簡報切換邏輯
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                if (i === index) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
-            });
-        }
-
-        // 綁定鍵盤左右鍵與空白鍵
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-                currentSlide = Math.min(slides.length - 1, currentSlide + 1);
-                showSlide(currentSlide);
-            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-                currentSlide = Math.max(0, currentSlide - 1);
-                showSlide(currentSlide);
-            }
-        });
-
-        // 點擊滑鼠左鍵也能下一頁 (方便操作)
-        document.addEventListener('click', (e) => {
-            // 防止點擊文字複製時觸發
-            if(window.getSelection().toString().length === 0) {
-                currentSlide = Math.min(slides.length - 1, currentSlide + 1);
-                showSlide(currentSlide);
-            }
-        });
-    </script>
-</body>
-</html>
+            <div class="bg-emerald-950/30 p-8 rounded-2xl border border-emerald-900/50 text-left">
+                <h3 class="text-4xl font-bold text-emerald-400 mb-6 flex items-center gap-3">🏂 使用對象：學生</h3>
+                <ul class="text-2xl text-slate-300 space-y-5 list-disc list-inside">
+                    <li><strong class="text-white">全方位推薦指南：</strong> 不再盲人摸象！平台智慧推薦雪場、雪道、住宿與裝備。</li>
+                    <li><strong class="text-white">專屬滑雪日誌：</strong> 紀錄自己的滑行歷程，留下真實評價，造福下一

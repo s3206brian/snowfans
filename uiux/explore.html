@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索雪友 | SnowFans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #020617; color: #f8fafc; font-family: sans-serif; }
+        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* 隱藏橫向捲軸 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-950 antialiased selection:bg-blue-500/30 pb-20">
+
+    <nav class="sticky top-0 z-50 glass-panel px-4 py-3 md:px-8 flex justify-between items-center">
+        <div class="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 tracking-tight flex items-center gap-2">
+            🏂 SnowFans
+        </div>
+        <div class="flex gap-4">
+            <button class="text-slate-400 hover:text-white transition"><i class="fa-regular fa-bell text-xl"></i></button>
+            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold border border-blue-400">B</div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 mt-6 md:mt-10">
+        
+        <div class="text-center space-y-4 mb-8">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white">尋找你的下一個神隊友</h1>
+            <p class="text-slate-400 text-sm md:text-lg">輸入雪場、日期、裝備，或是尋找專業教練</p>
+            
+            <div class="relative max-w-2xl mx-auto mt-6">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
+                </div>
+                <input type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-lg text-lg placeholder-slate-500" placeholder="試試搜尋「二世谷 教練」或「二手雪鞋」...">
+                <button class="absolute inset-y-2 right-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full px-6 font-bold transition">
+                    搜尋
+                </button>
+            </div>
+        </div>
+
+        <div class="flex gap-3 overflow-x-auto hide-scrollbar py-2 mb-8 max-w-2xl mx-auto">
+            <button class="whitespace-nowrap bg-blue-900/40 text-blue-400 border border-blue-800/50 px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-800/60 transition shadow-sm">
+                <i class="fa-solid fa-chalkboard-user mr-1"></i> 找教練
+            </button>
+            <button class="whitespace-nowrap bg-emerald-900/40 text-emerald-400 border border-emerald-800/50 px-5 py-2 rounded-full text-sm font-bold hover:bg-emerald-800/60 transition shadow-sm">
+                <i class="fa-solid fa-user-group mr-1"></i> 找雪伴 (約滑)
+            </button>
+            <button class="whitespace-nowrap bg-orange-900/40 text-orange-400 border border-orange-800/50 px-5 py-2 rounded-full text-sm font-bold hover:bg-orange-800/60 transition shadow-sm">
+                <i class="fa-solid fa-cart-shopping mr-1"></i> 二手買賣
+            </button>
+            <button class="whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700 px-5 py-2 rounded-full text-sm font-bold hover:bg-slate-700 transition shadow-sm">
+                🇯🇵 日本
+            </button>
+            <button class="whitespace-nowrap bg-slate-800 text-slate-300 border border-slate-700 px-5 py-2 rounded-full text-sm font-bold hover:bg-slate-700 transition shadow-sm">
+                下個月出發
+            </button>
+        </div>
+
+        <h2 class="text-xl font-bold text-white mb-4 border-b border-slate-800 pb-2">熱門動態與推薦</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <a href="profile-demo.html" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:-translate-y-1 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-900/20 transition-all block group">
+                <div class="h-24 bg-[url('https://images.unsplash.com/photo-1605540436563-5bca919ae766?q=80&w=400&auto=format&fit=crop')] bg-cover bg-center relative">
+                    <div class="absolute inset-0 bg-slate-950/60 group-hover:bg-slate-950/40 transition"></div>
+                    <div class="absolute bottom-[-20px] left-4 w-12 h-12 bg-blue-600 rounded-full border-4 border-slate-900 flex items-center justify-center text-white font-bold text-xl">B</div>
+                    <span class="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow"><i class="fa-solid fa-chalkboard-user"></i> 可教學</span>
+                </div>
+                <div class="p-5 pt-8">
+                    <h3 class="text-lg font-bold text-white">Brian, 28</h3>
+                    <p class="text-slate-400 text-sm mb-3">單板 Snowboard · 5年 · CASI Lv1</p>
+                    <div class="flex gap-2 mb-3">
+                        <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs border border-slate-700">🇯🇵 2/5-2/10 野澤</span>
+                    </div>
+                    <p class="text-slate-300 text-sm line-clamp-2">二月會在野澤溫泉，有新手想學單板可以找我！帶你安全推坡下山～</p>
+                </div>
+            </a>
+
+            <a href="#" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-900/20 transition-all block group">
+                <div class="h-24 bg-[url('https://images.unsplash.com/photo-1551524559-8af4e6624178?q=80&w=400&auto=format&fit=crop')] bg-cover bg-center relative">
+                    <div class="absolute inset-0 bg-slate-950/60 group-hover:bg-slate-950/40 transition"></div>
+                    <div class="absolute bottom-[-20px] left-4 w-12 h-12 bg-emerald-600 rounded-full border-4 border-slate-900 flex items-center justify-center text-white font-bold text-xl">A</div>
+                    <span class="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow"><i class="fa-solid fa-user-group"></i> 找雪伴</span>
+                </div>
+                <div class="p-5 pt-8">
+                    <h3 class="text-lg font-bold text-white">Alice, 25</h3>
+                    <p class="text-slate-400 text-sm mb-3">雙板 Ski · 2年</p>
+                    <div class="flex gap-2 mb-3">
+                        <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs border border-slate-700">🇯🇵 3/10-3/15 苗場</span>
+                    </div>
+                    <p class="text-slate-300 text-sm line-clamp-2">三月中會在苗場，主要都在紅線練功，找人一起吃飯或互相幫忙拍滑行影片！</p>
+                </div>
+            </a>
+
+            <a href="#" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-900/20 transition-all block group">
+                <div class="h-24 bg-[url('https://images.unsplash.com/photo-1565992441121-4367c2967103?q=80&w=400&auto=format&fit=crop')] bg-cover bg-center relative">
+                    <div class="absolute inset-0 bg-slate-950/60 group-hover:bg-slate-950/40 transition"></div>
+                    <div class="absolute bottom-[-20px] left-4 w-12 h-12 bg-slate-800 rounded-full border-4 border-slate-900 flex items-center justify-center text-xl">🥽</div>
+                    <span class="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow"><i class="fa-solid fa-cart-shopping"></i> 賣裝備</span>
+                </div>
+                <div class="p-5 pt-8">
+                    <h3 class="text-lg font-bold text-white">Kenji, 30</h3>
+                    <p class="text-slate-400 text-sm mb-3">裝備狂人 · 台北市面交</p>
+                    <div class="flex gap-2 mb-3">
+                        <span class="bg-orange-900/40 text-orange-400 border border-orange-800/50 px-2 py-1 rounded text-xs font-bold">Oakley 護目鏡</span>
+                        <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs border border-slate-700">$ 3,500</span>
+                    </div>
+                    <p class="text-slate-300 text-sm line-clamp-2">升級裝備故售出，只用過一季，無明顯刮傷。附贈原廠硬盒與擦拭布，誠可議。</p>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <div class="fixed bottom-0 left-0 w-full glass-panel border-t border-slate-800/80 md:hidden z-50 pb-safe">
+        <div class="flex justify-around items-center py-3">
+            <button class="flex flex-col items-center gap-1 text-blue-500">
+                <i class="fa-solid fa-compass text-xl"></i>
+                <span class="text-[10px] font-bold">探索</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 transition">
+                <i class="fa-regular fa-message text-xl"></i>
+                <span class="text-[10px] font-bold">訊息</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 transition">
+                <i class="fa-regular fa-user text-xl"></i>
+                <span class="text-[10px] font-bold">我的名片</span>
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

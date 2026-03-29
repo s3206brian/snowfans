@@ -2,6 +2,7 @@ import type { Equipment } from '@/lib/types'
 import { equipmentCategoryLabel } from '@/lib/utils/formatters'
 import { deleteEquipment } from '@/app/actions/equipment'
 import { EquipmentForm } from './EquipmentForm'
+import { EquipmentEditForm } from './EquipmentEditForm'
 
 type Props = {
   equipment: Equipment[]
@@ -60,6 +61,7 @@ export function EquipmentCard({ equipment, isOwner, userId }: Props) {
                     )}
                   </div>
                 </div>
+                {isOwner && <EquipmentEditForm item={item} />}
               </div>
             </li>
           ))}

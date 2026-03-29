@@ -8,6 +8,18 @@ type Props = {
   searchParams: Promise<{ q?: string; status?: string; tab?: string }>
 }
 
+type GearRow = {
+  id: string
+  brand: string | null
+  model: string | null
+  category: string
+  year: number | null
+  notes: string | null
+  sale_price: number | null
+  image_urls: string[]
+  profile: { username: string; display_name: string | null; avatar_url: string | null }
+}
+
 const STATUS_FILTERS = [
   { value: '',              label: '全部',   cls: '' },
   { value: 'teaching',      label: '找教練', cls: 'text-blue-400 border-blue-800/50 bg-blue-900/40' },
@@ -24,7 +36,7 @@ const TRIP_STATUS_LABEL: Record<string, { label: string; cls: string }> = {
 export default async function ExplorePage({ searchParams }: Props) {
   const { q, status, tab } = await searchParams
   const supabase = await createClient()
-  const activeTab = tab === 'trips' ? 'trips' : 'people'
+  const activeTab = tab === 'trips' ? 'trips' : tab === 'gear' ? 'gear' : 'people'
 
   // People query
   let query = supabase
@@ -37,7 +49,7 @@ export default async function ExplorePage({ searchParams }: Props) {
   if (q) query = query.or(`username.ilike.%${q}%,display_name.ilike.%${q}%,bio.ilike.%${q}%`)
   if (status) query = query.eq('trip_status', status as 'teaching' | 'learning' | 'finding_buddy')
 
-  // Trips query (upcoming public trips with finding_buddy or teaching)
+  // Trips query
   const today = new Date().toISOString().split('T')[0]
   const tripsQuery = supabase
     .from('trips')
@@ -48,7 +60,16 @@ export default async function ExplorePage({ searchParams }: Props) {
     .order('start_date', { ascending: true })
     .limit(30)
 
-  const [{ data: rows }, { data: tripsData }] = await Promise.all([query, tripsQuery])
+  // Gear query
+  const gearQuery = supabase
+    .from('equipment')
+    .select('id, brand, model, category, year, notes, sale_price, image_urls, profile:profiles(username, display_name, avatar_url)')
+    .eq('for_sale', true)
+    .eq('is_public', true)
+    .order('created_at', { ascending: false })
+    .limit(40)
+
+  const [{ data: rows }, { data: tripsData }, { data: gearData }] = await Promise.all([query, tripsQuery, gearQuery])
 
   type ProfileRow = Profile & { profile_tags: { tag: Tag }[] }
   const profiles: (Profile & { tags: Tag[] })[] = (rows ?? []).map((row: ProfileRow) => ({
@@ -58,6 +79,7 @@ export default async function ExplorePage({ searchParams }: Props) {
 
   type TripRow = Trip & { resort: Resort | null; profile: { id: string; username: string; display_name: string | null; avatar_url: string | null } }
   const trips = (tripsData ?? []) as TripRow[]
+  const gear = (gearData ?? []) as GearRow[]
 
   return (
     <main className="min-h-screen max-w-lg mx-auto pb-20">
@@ -72,25 +94,17 @@ export default async function ExplorePage({ searchParams }: Props) {
 
       {/* Tabs */}
       <div className="flex gap-2 px-4 mb-4">
-        <a
-          href={`/explore${q ? `?q=${encodeURIComponent(q)}` : ''}`}
-          className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${
-            activeTab === 'people'
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'
-          }`}
-        >
+        <a href={`/explore${q ? `?q=${encodeURIComponent(q)}` : ''}`}
+          className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'people' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
           雪友
         </a>
-        <a
-          href={`/explore?tab=trips${q ? `&q=${encodeURIComponent(q)}` : ''}`}
-          className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${
-            activeTab === 'trips'
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'
-          }`}
-        >
+        <a href="/explore?tab=trips"
+          className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'trips' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
           找行程
+        </a>
+        <a href="/explore?tab=gear"
+          className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'gear' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
+          找裝備
         </a>
       </div>
 
@@ -213,6 +227,63 @@ export default async function ExplorePage({ searchParams }: Props) {
                   </a>
                 )
               })}
+            </div>
+          )}
+        </div>
+      )}
+      {activeTab === 'gear' && (
+        <div className="px-4">
+          <p className="text-xs text-slate-500 mb-4">出售中的裝備 · {gear.length} 件</p>
+
+          {gear.length === 0 ? (
+            <div className="text-center py-20 text-slate-500">
+              <p className="text-5xl mb-4">🏂</p>
+              <p className="text-sm">目前沒有出售中的裝備</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {gear.map((item) => (
+                <a key={item.id} href={`/${item.profile.username}`}
+                  className="block rounded-xl bg-slate-900 border border-slate-800 overflow-hidden hover:border-slate-600 transition-colors">
+                  {item.image_urls?.length > 0 ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.image_urls[0]} alt="" className="w-full h-32 object-cover" />
+                  ) : (
+                    <div className="w-full h-32 bg-slate-800 flex items-center justify-center text-slate-600 text-3xl">
+                      🎿
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <p className="text-xs text-blue-400 mb-1">
+                      {item.category === 'board' ? '單板' : item.category === 'skis' ? '雙板' :
+                       item.category === 'boots' ? '雪靴' : item.category === 'helmet' ? '安全帽' :
+                       item.category === 'goggles' ? '護目鏡' : item.category === 'outerwear' ? '外套' : '其他'}
+                    </p>
+                    <p className="text-sm font-semibold text-white truncate">
+                      {item.brand ? `${item.brand} ` : ''}{item.model ?? '未命名'}
+                    </p>
+                    {item.year && <p className="text-xs text-slate-500">{item.year} 年款</p>}
+                    {item.sale_price && (
+                      <p className="text-sm font-bold text-emerald-400 mt-1">
+                        NT$ {item.sale_price.toLocaleString()}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <div className="w-4 h-4 rounded-full bg-slate-700 overflow-hidden flex items-center justify-center">
+                        {item.profile.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[8px] text-white font-bold">
+                            {(item.profile.display_name ?? item.profile.username).slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-500 truncate">@{item.profile.username}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
             </div>
           )}
         </div>

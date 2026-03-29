@@ -36,7 +36,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, displayName }: Props) {
 
       const formData = new FormData()
       formData.set('avatar_url', data.publicUrl)
-      startTransition(() => updateAvatar(formData))
+      startTransition(async () => { await updateAvatar(formData) })
     }
 
     setUploading(false)

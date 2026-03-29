@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { addResortVisit } from '@/app/actions/resortVisits'
 import type { Resort } from '@/lib/types'
 
@@ -16,6 +16,18 @@ type Props = { available: Resort[] }
 
 export function ResortVisitForm({ available }: Props) {
   const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    startTransition(async () => {
+      await addResortVisit(data)
+      setOpen(false)
+      formRef.current?.reset()
+    })
+  }
 
   if (!open) {
     return (
@@ -29,7 +41,7 @@ export function ResortVisitForm({ available }: Props) {
   }
 
   return (
-    <form action={async (data) => { await addResortVisit(data); setOpen(false) }}
+    <form ref={formRef} onSubmit={handleSubmit}
       className="space-y-2 rounded-xl border border-slate-700 bg-slate-900/50 p-3">
       <select name="resort_id" required
         className="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
@@ -55,9 +67,9 @@ export function ResortVisitForm({ available }: Props) {
           className="flex-1 py-2 text-sm text-slate-500 hover:text-white transition-colors">
           取消
         </button>
-        <button type="submit"
-          className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2 rounded-xl transition-colors">
-          新增
+        <button type="submit" disabled={isPending}
+          className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2 rounded-xl transition-colors disabled:opacity-60">
+          {isPending ? '新增中...' : '新增'}
         </button>
       </div>
     </form>

@@ -32,7 +32,7 @@ export default async function ProfilePage({ params }: Props) {
 
   const isOwner = user?.id === profile.id
 
-  const [visitsRes, equipmentRes, tagsRes, tripsRes] = await Promise.all([
+  const [visitsRes, equipmentRes, tagsRes, tripsRes, resortsRes] = await Promise.all([
     supabase
       .from('resort_visits')
       .select('*, resort:resorts(*)')
@@ -52,12 +52,14 @@ export default async function ProfilePage({ params }: Props) {
       .select('*, resort:resorts(*)')
       .eq('profile_id', profile.id)
       .order('start_date', { ascending: true }),
+    supabase.from('resorts').select('*').order('name_zh'),
   ])
 
-  const visits   = (visitsRes.data ?? []) as (ResortVisit & { resort: Resort })[]
+  const visits    = (visitsRes.data ?? []) as (ResortVisit & { resort: Resort })[]
   const equipment = equipmentRes.data ?? []
-  const tags     = (tagsRes.data ?? []).map((pt: { tag: Tag }) => pt.tag)
-  const trips    = (tripsRes.data ?? []) as (Trip & { resort: Resort | null })[]
+  const tags      = (tagsRes.data ?? []).map((pt: { tag: Tag }) => pt.tag)
+  const trips     = (tripsRes.data ?? []) as (Trip & { resort: Resort | null })[]
+  const allResorts = (resortsRes.data ?? []) as Resort[]
 
   return (
     <main className="min-h-screen max-w-lg mx-auto pb-20">
@@ -77,6 +79,13 @@ export default async function ProfilePage({ params }: Props) {
               )}
             </div>
             <p className="text-sm text-slate-500">@{profile.username}</p>
+            {(profile.board_type || profile.years_experience) && (
+              <p className="text-xs text-slate-500 mt-0.5">
+                {profile.board_type === 'snowboard' ? '單板' : profile.board_type === 'ski' ? '雙板' : profile.board_type === 'both' ? '單雙板' : ''}
+                {profile.years_experience ? `${profile.board_type ? ' · ' : ''}${profile.years_experience} 年` : ''}
+                {profile.instructor_cert ? ' · 教練資格' : ''}
+              </p>
+            )}
             {profile.trip_status && (
               <div className="mt-1.5">
                 <TripStatusBadge status={profile.trip_status as TripStatus} />
@@ -110,9 +119,9 @@ export default async function ProfilePage({ params }: Props) {
       <div className="px-4 py-5 space-y-6">
         <TripList trips={trips} isOwner={isOwner} />
         <div className="h-px bg-slate-800" />
-        <ResortFootprint visits={visits} />
+        <ResortFootprint visits={visits} allResorts={allResorts} isOwner={isOwner} />
         <div className="h-px bg-slate-800" />
-        <EquipmentCard equipment={equipment} />
+        <EquipmentCard equipment={equipment} isOwner={isOwner} />
       </div>
     </main>
   )

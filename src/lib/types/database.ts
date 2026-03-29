@@ -20,6 +20,9 @@ export type Database = {
           bio: string | null
           short_link: string
           trip_status: 'teaching' | 'learning' | 'finding_buddy' | null
+          board_type: 'snowboard' | 'ski' | 'both' | null
+          years_experience: number | null
+          instructor_cert: boolean
           privacy_settings: Json
           created_at: string
           updated_at: string
@@ -32,6 +35,9 @@ export type Database = {
           bio?: string | null
           short_link: string
           trip_status?: 'teaching' | 'learning' | 'finding_buddy' | null
+          board_type?: 'snowboard' | 'ski' | 'both' | null
+          years_experience?: number | null
+          instructor_cert?: boolean
           privacy_settings?: Json
         }
         Update: {
@@ -41,6 +47,9 @@ export type Database = {
           bio?: string | null
           short_link?: string
           trip_status?: 'teaching' | 'learning' | 'finding_buddy' | null
+          board_type?: 'snowboard' | 'ski' | 'both' | null
+          years_experience?: number | null
+          instructor_cert?: boolean
           privacy_settings?: Json
         }
         Relationships: []

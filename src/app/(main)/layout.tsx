@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { FloatingMenu } from '@/components/layout/FloatingMenu'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -21,6 +22,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         {children}
       </div>
       <BottomNav username={username} />
+      {user && <FloatingMenu />}
     </div>
   )
 }

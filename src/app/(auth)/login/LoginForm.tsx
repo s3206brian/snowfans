@@ -15,10 +15,11 @@ export function LoginForm() {
 
   async function handleGoogleLogin() {
     const supabase = createClient()
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? location.origin
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${base}/auth/callback`,
       },
     })
   }

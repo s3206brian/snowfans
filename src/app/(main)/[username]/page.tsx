@@ -21,13 +21,15 @@ export default async function ProfilePage({ params }: Props) {
   const { username } = await params
   const supabase = await createClient()
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('username', username)
-    .maybeSingle()
+  const [profileRes, { data: { user } }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('username', username).maybeSingle(),
+    supabase.auth.getUser(),
+  ])
 
+  const profile = profileRes.data
   if (!profile) notFound()
+
+  const isOwner = user?.id === profile.id
 
   // Fetch related data in parallel
   const [visitsRes, equipmentRes, tagsRes] = await Promise.all([
@@ -62,9 +64,19 @@ export default async function ProfilePage({ params }: Props) {
             size="lg"
           />
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate">
-              {profile.display_name ?? profile.username}
-            </h1>
+            <div className="flex items-center justify-between gap-2">
+              <h1 className="text-lg font-bold truncate">
+                {profile.display_name ?? profile.username}
+              </h1>
+              {isOwner && (
+                <a
+                  href="/settings"
+                  className="shrink-0 rounded-lg border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                  編輯
+                </a>
+              )}
+            </div>
             <p className="text-sm text-gray-400">@{profile.username}</p>
             {profile.trip_status && (
               <div className="mt-1.5">

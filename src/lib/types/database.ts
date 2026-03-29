@@ -158,6 +158,40 @@ export type Database = {
         }
         Relationships: []
       }
+      trips: {
+        Row: {
+          id: string
+          profile_id: string
+          resort_id: string | null
+          resort_name: string | null
+          start_date: string
+          end_date: string | null
+          status: 'teaching' | 'finding_buddy' | 'learning'
+          description: string | null
+          is_public: boolean
+          created_at: string
+        }
+        Insert: {
+          profile_id: string
+          resort_id?: string | null
+          resort_name?: string | null
+          start_date: string
+          end_date?: string | null
+          status: 'teaching' | 'finding_buddy' | 'learning'
+          description?: string | null
+          is_public?: boolean
+        }
+        Update: {
+          resort_id?: string | null
+          resort_name?: string | null
+          start_date?: string
+          end_date?: string | null
+          status?: 'teaching' | 'finding_buddy' | 'learning'
+          description?: string | null
+          is_public?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

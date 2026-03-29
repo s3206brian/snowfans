@@ -1,3 +1,4 @@
+// Next.js middleware entry point
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 

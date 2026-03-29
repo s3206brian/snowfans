@@ -39,5 +39,6 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/explore`)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? origin
+  return NextResponse.redirect(`${appUrl}/explore`)
 }

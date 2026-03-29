@@ -6,6 +6,7 @@ export type Resort = Database['public']['Tables']['resorts']['Row']
 export type Equipment = Database['public']['Tables']['equipment']['Row']
 export type Tag = Database['public']['Tables']['tags']['Row']
 export type Trip = Database['public']['Tables']['trips']['Row']
+export type Post = Database['public']['Tables']['posts']['Row']
 
 export type TripStatus = 'teaching' | 'learning' | 'finding_buddy'
 

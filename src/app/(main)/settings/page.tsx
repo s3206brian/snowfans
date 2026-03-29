@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SettingsForm } from './SettingsForm'
+import { AvatarUpload } from '@/components/settings/AvatarUpload'
 import { signOut } from '@/app/actions/auth'
 import type { Tag } from '@/lib/types'
 
@@ -36,6 +37,12 @@ export default async function SettingsPage({ searchParams }: Props) {
           查看主頁
         </a>
       </div>
+
+      <AvatarUpload
+        userId={user.id}
+        currentAvatarUrl={profileRes.data.avatar_url}
+        displayName={profileRes.data.display_name ?? profileRes.data.username}
+      />
 
       <SettingsForm
         profile={profileRes.data}

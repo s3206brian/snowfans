@@ -167,6 +167,33 @@ export type Database = {
         }
         Relationships: []
       }
+      posts: {
+        Row: {
+          id: string
+          profile_id: string
+          resort_id: string | null
+          title: string | null
+          content: string | null
+          image_urls: string[]
+          is_public: boolean
+          created_at: string
+        }
+        Insert: {
+          profile_id: string
+          resort_id?: string | null
+          title?: string | null
+          content?: string | null
+          image_urls?: string[]
+          is_public?: boolean
+        }
+        Update: {
+          title?: string | null
+          content?: string | null
+          image_urls?: string[]
+          is_public?: boolean
+        }
+        Relationships: []
+      }
       trips: {
         Row: {
           id: string

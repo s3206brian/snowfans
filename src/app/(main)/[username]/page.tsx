@@ -7,7 +7,9 @@ import { EquipmentCard } from '@/components/profile/EquipmentCard'
 import { TagList } from '@/components/profile/TagList'
 import { TripList } from '@/components/profile/TripList'
 import { CopyButton } from '@/components/profile/CopyButton'
-import type { TripStatus, ResortVisit, Resort, Tag, Trip } from '@/lib/types'
+import { PostList } from '@/components/profile/PostList'
+import { PostForm } from '@/components/profile/PostForm'
+import type { TripStatus, ResortVisit, Resort, Tag, Trip, Post } from '@/lib/types'
 
 type Props = {
   params: Promise<{ username: string }>
@@ -32,34 +34,21 @@ export default async function ProfilePage({ params }: Props) {
 
   const isOwner = user?.id === profile.id
 
-  const [visitsRes, equipmentRes, tagsRes, tripsRes, resortsRes] = await Promise.all([
-    supabase
-      .from('resort_visits')
-      .select('*, resort:resorts(*)')
-      .eq('profile_id', profile.id)
-      .order('visited_at', { ascending: false }),
-    supabase
-      .from('equipment')
-      .select('*')
-      .eq('profile_id', profile.id)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('profile_tags')
-      .select('tag:tags(*)')
-      .eq('profile_id', profile.id),
-    supabase
-      .from('trips')
-      .select('*, resort:resorts(*)')
-      .eq('profile_id', profile.id)
-      .order('start_date', { ascending: true }),
+  const [visitsRes, equipmentRes, tagsRes, tripsRes, resortsRes, postsRes] = await Promise.all([
+    supabase.from('resort_visits').select('*, resort:resorts(*)').eq('profile_id', profile.id).order('visited_at', { ascending: false }),
+    supabase.from('equipment').select('*').eq('profile_id', profile.id).order('created_at', { ascending: false }),
+    supabase.from('profile_tags').select('tag:tags(*)').eq('profile_id', profile.id),
+    supabase.from('trips').select('*, resort:resorts(*)').eq('profile_id', profile.id).order('start_date', { ascending: true }),
     supabase.from('resorts').select('*').order('name_zh'),
+    supabase.from('posts').select('*, resort:resorts(*)').eq('profile_id', profile.id).order('created_at', { ascending: false }),
   ])
 
-  const visits    = (visitsRes.data ?? []) as (ResortVisit & { resort: Resort })[]
-  const equipment = equipmentRes.data ?? []
-  const tags      = (tagsRes.data ?? []).map((pt: { tag: Tag }) => pt.tag)
-  const trips     = (tripsRes.data ?? []) as (Trip & { resort: Resort | null })[]
+  const visits     = (visitsRes.data ?? []) as (ResortVisit & { resort: Resort })[]
+  const equipment  = equipmentRes.data ?? []
+  const tags       = (tagsRes.data ?? []).map((pt: { tag: Tag }) => pt.tag)
+  const trips      = (tripsRes.data ?? []) as (Trip & { resort: Resort | null })[]
   const allResorts = (resortsRes.data ?? []) as Resort[]
+  const posts      = (postsRes.data ?? []) as (Post & { resort: Resort | null })[]
 
   return (
     <main className="min-h-screen max-w-lg mx-auto pb-20">
@@ -122,6 +111,11 @@ export default async function ProfilePage({ params }: Props) {
         <ResortFootprint visits={visits} allResorts={allResorts} isOwner={isOwner} />
         <div className="h-px bg-slate-800" />
         <EquipmentCard equipment={equipment} isOwner={isOwner} />
+        <div className="h-px bg-slate-800" />
+        <PostList posts={posts} isOwner={isOwner} />
+        {isOwner && (
+          <PostForm resorts={allResorts} userId={profile.id} />
+        )}
       </div>
     </main>
   )

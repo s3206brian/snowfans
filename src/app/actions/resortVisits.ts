@@ -10,10 +10,16 @@ export async function addResortVisit(formData: FormData) {
 
   const resort_id = formData.get('resort_id') as string
   const visited_at = (formData.get('visited_at') as string) || null
+  const snow_condition = (formData.get('snow_condition') as string) || null
 
   if (!resort_id) return
 
-  await supabase.from('resort_visits').insert({ profile_id: user.id, resort_id, visited_at })
+  await supabase.from('resort_visits').insert({
+    profile_id: user.id,
+    resort_id,
+    visited_at,
+    snow_condition: snow_condition as 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null,
+  })
 
   const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single()
   revalidatePath(`/${profile?.username}`)

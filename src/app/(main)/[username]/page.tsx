@@ -110,7 +110,7 @@ export default async function ProfilePage({ params }: Props) {
         <div className="h-px bg-slate-800" />
         <ResortFootprint visits={visits} allResorts={allResorts} isOwner={isOwner} />
         <div className="h-px bg-slate-800" />
-        <EquipmentCard equipment={equipment} isOwner={isOwner} />
+        <EquipmentCard equipment={equipment} isOwner={isOwner} userId={profile.id} />
         <div className="h-px bg-slate-800" />
         <PostList posts={posts} isOwner={isOwner} />
         {isOwner && (

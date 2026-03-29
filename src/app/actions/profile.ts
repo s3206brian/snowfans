@@ -22,6 +22,7 @@ export async function updateProfile(
   const board_type       = (formData.get('board_type') as string) || null
   const years_experience = parseInt(formData.get('years_experience') as string) || null
   const instructor_cert  = formData.get('instructor_cert') === 'on'
+  const is_public        = formData.get('is_public') !== 'off'
   const tag_ids          = formData.getAll('tag_ids') as string[]
 
   const { error } = await supabase
@@ -33,6 +34,7 @@ export async function updateProfile(
       board_type: board_type as 'snowboard' | 'ski' | 'both' | null,
       years_experience,
       instructor_cert,
+      is_public,
     })
     .eq('id', user.id)
 

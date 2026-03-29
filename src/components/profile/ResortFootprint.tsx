@@ -2,6 +2,18 @@ import type { ResortVisit, Resort } from '@/lib/types'
 import { formatVisitYear } from '@/lib/utils/formatters'
 import { addResortVisit, deleteResortVisit } from '@/app/actions/resortVisits'
 
+const SNOW_CONDITIONS = [
+  { value: 'powder',   label: '粉雪 ❄️' },
+  { value: 'groomed',  label: '整備 🎿' },
+  { value: 'icy',      label: '冰硬 🧊' },
+  { value: 'wet',      label: '濕雪 💧' },
+  { value: 'variable', label: '多變 🌤' },
+] as const
+
+const SNOW_CONDITION_LABEL: Record<string, string> = {
+  powder: '粉雪', groomed: '整備', icy: '冰硬', wet: '濕雪', variable: '多變',
+}
+
 type VisitWithResort = ResortVisit & { resort: Resort }
 
 type Props = {
@@ -37,6 +49,9 @@ export function ResortFootprint({ visits, allResorts, isOwner }: Props) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                {v.snow_condition && (
+                  <span className="text-xs text-slate-400">{SNOW_CONDITION_LABEL[v.snow_condition]}</span>
+                )}
                 {v.visited_at && (
                   <span className="text-xs text-slate-500">{formatVisitYear(v.visited_at)}</span>
                 )}
@@ -73,8 +88,17 @@ export function ResortFootprint({ visits, allResorts, isOwner }: Props) {
             placeholder="年份"
             min="2000"
             max={new Date().getFullYear()}
-            className="w-24 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 placeholder-slate-600"
+            className="w-20 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 placeholder-slate-600"
           />
+          <select
+            name="snow_condition"
+            className="flex-1 bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 min-w-0"
+          >
+            <option value="">雪況（選填）</option>
+            {SNOW_CONDITIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
           <button
             type="submit"
             className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"

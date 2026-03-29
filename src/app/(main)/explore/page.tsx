@@ -30,6 +30,7 @@ export default async function ExplorePage({ searchParams }: Props) {
   let query = supabase
     .from('profiles')
     .select('*, profile_tags(tag:tags(*))')
+    .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(40)
 

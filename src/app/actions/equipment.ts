@@ -13,6 +13,9 @@ export async function addEquipment(formData: FormData) {
   const model = (formData.get('model') as string).trim() || null
   const year = parseInt(formData.get('year') as string) || null
   const notes = (formData.get('notes') as string).trim() || null
+  const image_urls = formData.getAll('image_urls') as string[]
+  const for_sale = formData.get('for_sale') === 'on'
+  const sale_price = parseFloat(formData.get('sale_price') as string) || null
 
   if (!category) return
 
@@ -23,6 +26,9 @@ export async function addEquipment(formData: FormData) {
     model,
     year,
     notes,
+    image_urls,
+    for_sale,
+    sale_price,
   })
 
   const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single()

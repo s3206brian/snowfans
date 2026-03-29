@@ -177,6 +177,24 @@ export function SettingsForm({ profile, allTags, selectedTagIds, saved }: Props)
         </div>
       </div>
 
+      {/* Privacy */}
+      <div className="flex items-center justify-between rounded-xl bg-slate-900 border border-slate-800 px-4 py-3">
+        <div>
+          <p className="text-sm font-medium text-white">公開名片</p>
+          <p className="text-xs text-slate-500 mt-0.5">關閉後其他人無法在探索頁面看到你</p>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            name="is_public"
+            value="on"
+            defaultChecked={profile.is_public ?? true}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-slate-700 peer-checked:bg-blue-600 rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+        </label>
+      </div>
+
       <button
         type="submit"
         disabled={isPending}

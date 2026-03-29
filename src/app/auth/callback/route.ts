@@ -8,6 +8,35 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     await supabase.auth.exchangeCodeForSession(code)
+
+    // Ensure profile exists (trigger may fail for OAuth users)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile) {
+        const emailPrefix = (user.email ?? '').split('@')[0]
+        const base = emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`
+        const username = emailPrefix || base
+        const short_link = base.toLowerCase()
+        const display_name =
+          user.user_metadata?.full_name ??
+          user.user_metadata?.name ??
+          username
+
+        await supabase.from('profiles').insert({
+          id: user.id,
+          username,
+          short_link,
+          display_name,
+          avatar_url: user.user_metadata?.avatar_url ?? null,
+        })
+      }
+    }
   }
 
   return NextResponse.redirect(`${origin}/explore`)

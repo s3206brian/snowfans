@@ -1,5 +1,5 @@
 import type { ResortVisit, Resort } from '@/lib/types'
-import { formatVisitYear } from '@/lib/utils/formatters'
+import { formatVisitRange } from '@/lib/utils/formatters'
 import { deleteResortVisit } from '@/app/actions/resortVisits'
 import { ResortVisitForm } from './ResortVisitForm'
 
@@ -56,7 +56,7 @@ export function ResortFootprint({ visits, allResorts, isOwner }: Props) {
                     <span className="text-xs text-slate-400">{SNOW_CONDITION_LABEL[v.snow_condition]}</span>
                   )}
                   {v.visited_at && (
-                    <span className="text-xs text-slate-500">{formatVisitYear(v.visited_at)}</span>
+                    <span className="text-xs text-slate-500">{formatVisitRange(v.visited_at, v.visited_end ?? null)}</span>
                   )}
                   {isOwner && (
                     <form action={deleteResortVisit.bind(null, v.id)}>

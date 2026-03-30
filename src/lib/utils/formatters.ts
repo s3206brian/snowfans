@@ -3,6 +3,14 @@ export function formatVisitYear(dateStr: string | null): string {
   return new Date(dateStr).getFullYear().toString()
 }
 
+export function formatVisitRange(start: string | null, end: string | null): string {
+  if (!start) return ''
+  const fmt = (d: string) => new Intl.DateTimeFormat('zh-Hant', { month: 'numeric', day: 'numeric' }).format(new Date(d))
+  const year = new Date(start).getFullYear()
+  if (!end || end === start) return `${year}/${fmt(start)}`
+  return `${year}/${fmt(start)} – ${fmt(end)}`
+}
+
 export function formatDate(dateStr: string | null): string {
   if (!dateStr) return ''
   return new Intl.DateTimeFormat('zh-Hant', {

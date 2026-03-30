@@ -9,8 +9,8 @@ export async function addResortVisit(formData: FormData): Promise<{ error?: stri
   if (!user) return { error: '請先登入' }
 
   const resort_id = formData.get('resort_id') as string
-  const yearStr = (formData.get('visited_at') as string).trim()
-  const visited_at = yearStr ? `${yearStr}-01-01` : null
+  const visited_at = (formData.get('visited_at') as string).trim() || null
+  const visited_end = (formData.get('visited_end') as string).trim() || null
   const snow_condition = (formData.get('snow_condition') as string) || null
 
   if (!resort_id) return { error: '請選擇雪場' }
@@ -19,6 +19,7 @@ export async function addResortVisit(formData: FormData): Promise<{ error?: stri
     profile_id: user.id,
     resort_id,
     visited_at,
+    visited_end,
     snow_condition: snow_condition as 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null,
   }).select('id').single()
 

@@ -72,18 +72,22 @@ export function ResortVisitForm({ available }: Props) {
         ))}
       </select>
 
-      <div className="flex gap-2">
-        <input name="visited_at" type="number" placeholder="年份" min="2000" max={new Date().getFullYear()}
-          className="w-24 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 placeholder-slate-600"
+      <div className="flex gap-2 items-center">
+        <input name="visited_at" type="date" max={new Date().toISOString().split('T')[0]}
+          className="flex-1 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
         />
-        <select name="snow_condition"
-          className="flex-1 bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
-          <option value="">雪況（選填）</option>
-          {SNOW_CONDITIONS.map(({ value, label }) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
+        <span className="text-slate-500 text-sm shrink-0">—</span>
+        <input name="visited_end" type="date" max={new Date().toISOString().split('T')[0]}
+          className="flex-1 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
+        />
       </div>
+      <select name="snow_condition"
+        className="w-full bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
+        <option value="">雪況（選填）</option>
+        {SNOW_CONDITIONS.map(({ value, label }) => (
+          <option key={value} value={value}>{label}</option>
+        ))}
+      </select>
 
       {/* Run picker — only show if resort has coordinates */}
       {selectedResort?.latitude && selectedResort?.longitude && (

@@ -61,6 +61,7 @@ export type Database = {
           profile_id: string
           resort_id: string
           visited_at: string | null
+          visited_end: string | null
           notes: string | null
           snow_condition: 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null
           created_at: string

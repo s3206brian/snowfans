@@ -24,15 +24,33 @@ const DIFFICULTY_LABEL: Record<string, { label: string; color: string }> = {
   expert:       { label: '專', color: 'text-red-600' },
 }
 
+function calcTotalDays(visits: VisitWithResort[]): number {
+  return visits.reduce((sum, v) => {
+    if (!v.visited_at) return sum + 1
+    const start = new Date(v.visited_at)
+    const end = v.visited_end ? new Date(v.visited_end) : start
+    const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1
+    return sum + days
+  }, 0)
+}
+
 export function ResortFootprint({ visits, allResorts, isOwner }: Props) {
   const visitedIds = new Set(visits.map((v) => v.resort_id))
   const available = (allResorts ?? []).filter((r) => !visitedIds.has(r.id))
+  const totalDays = visits.length > 0 ? calcTotalDays(visits) : 0
 
   return (
     <section>
-      <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
-        雪場足跡{visits.length > 0 ? ` · ${visits.length} 座` : ''}
-      </h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+          雪場足跡{visits.length > 0 ? ` · ${visits.length} 座` : ''}
+        </h2>
+        {totalDays > 0 && (
+          <span className="text-xs text-blue-400 font-medium">
+            雪齡 {totalDays} 天
+          </span>
+        )}
+      </div>
 
       {visits.length === 0 && (
         <p className="text-sm text-slate-600 mb-3">尚未記錄任何雪場</p>

@@ -35,7 +35,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
       const base = emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`
       await supabase.from('profiles').insert({
         id: data.user.id,
-        username: emailPrefix || base,
+        username: base,
         short_link: base.toLowerCase(),
         display_name: data.user.user_metadata?.full_name ?? emailPrefix,
         avatar_url: data.user.user_metadata?.avatar_url ?? null,

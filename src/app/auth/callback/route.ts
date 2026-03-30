@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       if (!profile) {
         const emailPrefix = (user.email ?? '').split('@')[0]
         const base = emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`
-        const username = emailPrefix || base
+        const username = base
         const short_link = base.toLowerCase()
         const display_name =
           user.user_metadata?.full_name ??

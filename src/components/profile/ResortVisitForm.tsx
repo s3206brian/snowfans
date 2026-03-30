@@ -2,7 +2,9 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { addResortVisit } from '@/app/actions/resortVisits'
+import { ResortRunPicker } from '@/components/map/ResortRunPicker'
 import type { Resort } from '@/lib/types'
+import type { SkiRun } from '@/app/api/runs/route'
 
 const SNOW_CONDITIONS = [
   { value: 'powder',   label: '粉雪 ❄️' },
@@ -18,18 +20,33 @@ export function ResortVisitForm({ available }: Props) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [selectedResort, setSelectedResort] = useState<Resort | null>(null)
+  const [selectedRuns, setSelectedRuns] = useState<SkiRun[]>([])
   const formRef = useRef<HTMLFormElement>(null)
+
+  function handleResortChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const resort = available.find((r) => r.id === e.target.value) ?? null
+    setSelectedResort(resort)
+    setSelectedRuns([])
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     const data = new FormData(e.currentTarget)
+    data.set('runs_json', JSON.stringify(selectedRuns.map((r) => ({
+      osm_id: r.osm_id,
+      name: r.name,
+      difficulty: r.difficulty,
+    }))))
     startTransition(async () => {
       const result = await addResortVisit(data)
       if (result?.error) {
         setError(result.error)
       } else {
         setOpen(false)
+        setSelectedResort(null)
+        setSelectedRuns([])
         formRef.current?.reset()
       }
     })
@@ -37,10 +54,8 @@ export function ResortVisitForm({ available }: Props) {
 
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="w-full rounded-xl border border-dashed border-slate-700 py-2 text-sm text-slate-500 hover:border-blue-500 hover:text-blue-400 transition-colors"
-      >
+      <button onClick={() => setOpen(true)}
+        className="w-full rounded-xl border border-dashed border-slate-700 py-2 text-sm text-slate-500 hover:border-blue-500 hover:text-blue-400 transition-colors">
         + 新增雪場足跡
       </button>
     )
@@ -48,14 +63,15 @@ export function ResortVisitForm({ available }: Props) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}
-      className="space-y-2 rounded-xl border border-slate-700 bg-slate-900/50 p-3">
-      <select name="resort_id" required
+      className="space-y-3 rounded-xl border border-slate-700 bg-slate-900/50 p-3">
+      <select name="resort_id" required onChange={handleResortChange}
         className="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
         <option value="">選擇雪場...</option>
         {available.map((r) => (
           <option key={r.id} value={r.id}>{r.name_zh ?? r.name} ({r.country})</option>
         ))}
       </select>
+
       <div className="flex gap-2">
         <input name="visited_at" type="number" placeholder="年份" min="2000" max={new Date().getFullYear()}
           className="w-24 bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 placeholder-slate-600"
@@ -68,15 +84,29 @@ export function ResortVisitForm({ available }: Props) {
           ))}
         </select>
       </div>
+
+      {/* Run picker — only show if resort has coordinates */}
+      {selectedResort?.latitude && selectedResort?.longitude && (
+        <div>
+          <p className="text-xs text-slate-500 mb-2">選擇你滑過的雪道（選填）</p>
+          <ResortRunPicker
+            lat={selectedResort.latitude}
+            lon={selectedResort.longitude}
+            onChange={setSelectedRuns}
+          />
+        </div>
+      )}
+
       {error && <p className="text-xs text-rose-400">{error}</p>}
+
       <div className="flex gap-2">
-        <button type="button" onClick={() => { setOpen(false); setError(null) }}
+        <button type="button" onClick={() => { setOpen(false); setError(null); setSelectedResort(null) }}
           className="flex-1 py-2 text-sm text-slate-500 hover:text-white transition-colors">
           取消
         </button>
         <button type="submit" disabled={isPending}
           className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2 rounded-xl transition-colors disabled:opacity-60">
-          {isPending ? '新增中...' : '新增'}
+          {isPending ? '新增中...' : `新增${selectedRuns.length > 0 ? ` (${selectedRuns.length} 條雪道)` : ''}`}
         </button>
       </div>
     </form>

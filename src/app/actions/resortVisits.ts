@@ -14,14 +14,32 @@ export async function addResortVisit(formData: FormData): Promise<{ error?: stri
 
   if (!resort_id) return { error: '請選擇雪場' }
 
-  const { error } = await supabase.from('resort_visits').insert({
+  const { data: visit, error } = await supabase.from('resort_visits').insert({
     profile_id: user.id,
     resort_id,
     visited_at,
     snow_condition: snow_condition as 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null,
-  })
+  }).select('id').single()
 
   if (error) return { error: error.message }
+
+  // Save selected runs
+  const runsJson = formData.get('runs_json') as string
+  if (runsJson && visit) {
+    try {
+      const runs = JSON.parse(runsJson) as { osm_id: string; name: string | null; difficulty: string | null }[]
+      if (runs.length > 0) {
+        await supabase.from('visit_runs').insert(
+          runs.map((r) => ({
+            visit_id: visit.id,
+            osm_id: r.osm_id,
+            run_name: r.name,
+            difficulty: r.difficulty,
+          }))
+        )
+      }
+    } catch { /* ignore parse errors */ }
+  }
 
   const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single()
   revalidatePath(`/${profile?.username}`)

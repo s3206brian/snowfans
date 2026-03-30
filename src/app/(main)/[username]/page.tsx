@@ -35,7 +35,7 @@ export default async function ProfilePage({ params }: Props) {
   const isOwner = user?.id === profile.id
 
   const [visitsRes, equipmentRes, tagsRes, tripsRes, resortsRes, postsRes] = await Promise.all([
-    supabase.from('resort_visits').select('*, resort:resorts(*)').eq('profile_id', profile.id).order('visited_at', { ascending: false }),
+    supabase.from('resort_visits').select('*, resort:resorts(*), visit_runs(osm_id, run_name, difficulty)').eq('profile_id', profile.id).order('visited_at', { ascending: false }),
     supabase.from('equipment').select('*').eq('profile_id', profile.id).order('created_at', { ascending: false }),
     supabase.from('profile_tags').select('tag:tags(*)').eq('profile_id', profile.id),
     supabase.from('trips').select('*, resort:resorts(*)').eq('profile_id', profile.id).order('start_date', { ascending: true }),

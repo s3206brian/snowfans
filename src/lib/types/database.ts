@@ -172,6 +172,27 @@ export type Database = {
         }
         Relationships: []
       }
+      visit_runs: {
+        Row: {
+          id: string
+          visit_id: string
+          osm_id: string
+          run_name: string | null
+          difficulty: string | null
+          created_at: string
+        }
+        Insert: {
+          visit_id: string
+          osm_id: string
+          run_name?: string | null
+          difficulty?: string | null
+        }
+        Update: {
+          run_name?: string | null
+          difficulty?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           id: string

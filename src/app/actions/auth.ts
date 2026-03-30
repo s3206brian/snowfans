@@ -16,10 +16,31 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error, data } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     return { error: '電子郵件或密碼錯誤' }
+  }
+
+  // Ensure profile exists (trigger may have failed on signup)
+  if (data.user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', data.user.id)
+      .maybeSingle()
+
+    if (!profile) {
+      const emailPrefix = (data.user.email ?? '').split('@')[0]
+      const base = emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        username: emailPrefix || base,
+        short_link: base.toLowerCase(),
+        display_name: data.user.user_metadata?.full_name ?? emailPrefix,
+        avatar_url: data.user.user_metadata?.avatar_url ?? null,
+      })
+    }
   }
 
   redirect('/explore')

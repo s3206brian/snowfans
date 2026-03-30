@@ -17,15 +17,21 @@ type Props = { available: Resort[] }
 export function ResortVisitForm({ available }: Props) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setError(null)
     const data = new FormData(e.currentTarget)
     startTransition(async () => {
-      await addResortVisit(data)
-      setOpen(false)
-      formRef.current?.reset()
+      const result = await addResortVisit(data)
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setOpen(false)
+        formRef.current?.reset()
+      }
     })
   }
 
@@ -62,8 +68,9 @@ export function ResortVisitForm({ available }: Props) {
           ))}
         </select>
       </div>
+      {error && <p className="text-xs text-rose-400">{error}</p>}
       <div className="flex gap-2">
-        <button type="button" onClick={() => setOpen(false)}
+        <button type="button" onClick={() => { setOpen(false); setError(null) }}
           className="flex-1 py-2 text-sm text-slate-500 hover:text-white transition-colors">
           取消
         </button>

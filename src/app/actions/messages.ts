@@ -26,7 +26,7 @@ export async function getOrCreateConversation(otherUserId: string) {
     .select('id')
     .single() as { data: { id: string } | null; error: any }
 
-  if (error) throw new Error(error.message)
+  if (error || !created) throw new Error(error?.message ?? 'Failed to create conversation')
   return created.id
 }
 

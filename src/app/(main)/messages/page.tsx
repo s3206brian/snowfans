@@ -7,7 +7,7 @@ export default async function MessagesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: convos } = await supabase
+  const { data: convos } = await (supabase as any)
     .from('conversations')
     .select(`
       id,

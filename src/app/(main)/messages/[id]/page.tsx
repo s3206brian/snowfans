@@ -9,11 +9,11 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: convo } = await supabase
+  const { data: convo } = await (supabase as any)
     .from('conversations')
     .select('id, user_a, user_b')
     .eq('id', id)
-    .single()
+    .single() as { data: { id: string; user_a: string; user_b: string } | null }
 
   if (!convo || (convo.user_a !== user.id && convo.user_b !== user.id)) {
     redirect('/messages')

@@ -15,9 +15,13 @@ export const metadata: Metadata = {
   },
   description: "專為中文語系滑雪愛好者打造的社群平台",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo-icon.svg",
+    apple: "/logo-icon.svg",
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "SnowFans",
   },
 };

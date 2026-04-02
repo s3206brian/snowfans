@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none">
+  <defs>
+    <g id="sf-arm-favicon">
+      <line x1="0" y1="0" x2="0" y2="-22"/>
+      <line x1="-7" y1="-14" x2="7" y2="-14"/>
+    </g>
+  </defs>
+  <rect width="56" height="56" rx="12" fill="#020617"/>
+  <g transform="translate(28,28)" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round">
+    <use href="#sf-arm-favicon"/>
+    <use href="#sf-arm-favicon" transform="rotate(60)"/>
+    <use href="#sf-arm-favicon" transform="rotate(120)"/>
+    <use href="#sf-arm-favicon" transform="rotate(180)"/>
+    <use href="#sf-arm-favicon" transform="rotate(240)"/>
+    <use href="#sf-arm-favicon" transform="rotate(300)"/>
+    <circle cx="0" cy="0" r="3" fill="#38BDF8" stroke="none"/>
+  </g>
+</svg>

@@ -9,6 +9,7 @@ import { TripList } from '@/components/profile/TripList'
 import { CopyButton } from '@/components/profile/CopyButton'
 import { PostList } from '@/components/profile/PostList'
 import { PostForm } from '@/components/profile/PostForm'
+import { SendMessageButton } from '@/components/profile/SendMessageButton'
 import type { TripStatus, ResortVisit, Resort, Tag, Trip, Post } from '@/lib/types'
 
 type Props = {
@@ -61,10 +62,12 @@ export default async function ProfilePage({ params }: Props) {
               <h1 className="text-lg font-bold text-white truncate">
                 {profile.display_name ?? profile.username}
               </h1>
-              {isOwner && (
+              {isOwner ? (
                 <a href="/settings" className="shrink-0 rounded-lg border border-slate-700 px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 transition-colors">
                   編輯
                 </a>
+              ) : user && (
+                <SendMessageButton targetUserId={profile.id} />
               )}
             </div>
             <p className="text-sm text-slate-500">@{profile.username}</p>

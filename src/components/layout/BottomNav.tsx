@@ -18,6 +18,12 @@ export function BottomNav({ username }: Props) {
       active: pathname.startsWith('/explore'),
     },
     {
+      href: '/messages',
+      label: '私訊',
+      icon: MessageIcon,
+      active: pathname.startsWith('/messages'),
+    },
+    {
       href: username ? `/${username}` : '/login',
       label: '我的名片',
       icon: UserIcon,
@@ -51,6 +57,15 @@ function CompassIcon({ active }: { active: boolean }) {
       strokeWidth={active ? 2.5 : 2} className="h-5 w-5">
       <circle cx="12" cy="12" r="10" />
       <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  )
+}
+
+function MessageIcon({ active }: { active: boolean }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2} className="h-5 w-5">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   )
 }

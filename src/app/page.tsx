@@ -11,13 +11,13 @@ export default function HomePage() {
 
         <div className="relative">
           <span className="inline-block rounded-full bg-blue-900/40 text-blue-400 border border-blue-800/50 text-xs font-semibold px-3 py-1 mb-6 tracking-wide">
-            專為中文語系滑雪愛好者打造
+            Open Source · Non-profit · Community
           </span>
           <h1 className="text-6xl font-extrabold tracking-tight text-white">
             Snow<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Fans</span>
           </h1>
           <p className="mt-4 text-xl text-slate-400 max-w-sm mx-auto leading-relaxed">
-            記錄你的雪場足跡，<br />找到志同道合的雪友
+            開源的滑雪社群平台<br />分享行程、裝備與雪場足跡
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/login" className="rounded-2xl bg-blue-600 px-8 py-3.5 text-white font-semibold text-base hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/40">

@@ -24,20 +24,41 @@ export function LoginForm() {
     })
   }
 
+  async function handleAppleLogin() {
+    const supabase = createClient()
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? location.origin
+    await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: `${base}/auth/callback`,
+      },
+    })
+  }
+
   if (tab === 'login') {
     return (
       <div className="space-y-4">
         <TabSwitcher tab={tab} onChange={setTab} />
 
-        {/* Google */}
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
-        >
-          <GoogleIcon />
-          使用 Google 登入
-        </button>
+        {/* Social login */}
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+          >
+            <GoogleIcon />
+            使用 Google 登入
+          </button>
+          <button
+            type="button"
+            onClick={handleAppleLogin}
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
+          >
+            <AppleIcon />
+            使用 Apple 登入
+          </button>
+        </div>
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-slate-800" />
@@ -109,15 +130,25 @@ export function LoginForm() {
     <div className="space-y-4">
       <TabSwitcher tab={tab} onChange={setTab} />
 
-      {/* Google */}
-      <button
-        type="button"
-        onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
-      >
-        <GoogleIcon />
-        使用 Google 註冊
-      </button>
+      {/* Social login */}
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+        >
+          <GoogleIcon />
+          使用 Google 註冊
+        </button>
+        <button
+          type="button"
+          onClick={handleAppleLogin}
+          className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
+        >
+          <AppleIcon />
+          使用 Apple 註冊
+        </button>
+      </div>
 
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-slate-800" />
@@ -179,6 +210,14 @@ export function LoginForm() {
         </button>
       </form>
     </div>
+  )
+}
+
+function AppleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-white" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.55-1.31 3.09-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+    </svg>
   )
 }
 

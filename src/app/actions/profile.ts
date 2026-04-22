@@ -50,3 +50,28 @@ export async function updateProfile(
 
   redirect('/settings?saved=1')
 }
+
+export async function deleteAccount(): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: '請先登入' }
+
+  // Delete all user data
+  await Promise.all([
+    supabase.from('profile_tags').delete().eq('profile_id', user.id),
+    supabase.from('equipment').delete().eq('user_id', user.id),
+    supabase.from('trips').delete().eq('user_id', user.id),
+    supabase.from('messages').delete().eq('sender_id', user.id),
+  ])
+  await supabase.from('profiles').delete().eq('id', user.id)
+
+  // Delete auth user using admin client
+  const { createClient: createAdmin } = await import('@supabase/supabase-js')
+  const adminClient = createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  await adminClient.auth.admin.deleteUser(user.id)
+
+  redirect('/login')
+}

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { SettingsForm } from './SettingsForm'
 import { AvatarUpload } from '@/components/settings/AvatarUpload'
 import { signOut } from '@/app/actions/auth'
+import { deleteAccount } from '@/app/actions/profile'
 import type { Tag } from '@/lib/types'
 
 export const metadata = { title: '編輯個人資料' }
@@ -51,15 +52,31 @@ export default async function SettingsPage({ searchParams }: Props) {
         saved={saved === '1'}
       />
 
-      <div className="mt-10 border-t border-gray-100 pt-6">
+      <div className="mt-10 border-t border-slate-800 pt-6 space-y-3">
         <form action={signOut}>
           <button
             type="submit"
-            className="w-full rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+            className="w-full rounded-xl border border-slate-700 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-900 transition-colors"
           >
             登出
           </button>
         </form>
+      </div>
+
+      <div className="mt-4 border-t border-red-900/30 pt-6">
+        <p className="text-xs text-slate-600 mb-3 text-center">危險操作</p>
+        <form action={deleteAccount}>
+          <button
+            type="submit"
+            className="w-full rounded-xl border border-red-900/50 py-2.5 text-sm font-medium text-red-500 hover:bg-red-950/30 transition-colors"
+            onClick={(e) => {
+              if (!confirm('確定要永久刪除帳號嗎？此操作無法復原。')) e.preventDefault()
+            }}
+          >
+            刪除帳號
+          </button>
+        </form>
+        <p className="text-xs text-slate-700 text-center mt-2">永久刪除帳號及所有相關資料</p>
       </div>
     </main>
   )

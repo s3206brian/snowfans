@@ -11,6 +11,7 @@ import { PostList } from '@/components/profile/PostList'
 import { PostForm } from '@/components/profile/PostForm'
 import { SendMessageButton } from '@/components/profile/SendMessageButton'
 import type { TripStatus, ResortVisit, Resort, Tag, Trip, Post } from '@/lib/types'
+import SupportPage from '../support/page'
 
 type Props = {
   params: Promise<{ username: string }>
@@ -18,11 +19,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { username } = await params
+  if (username === 'support') return { title: '支援中心' }
   return { title: `@${username}` }
 }
 
 export default async function ProfilePage({ params }: Props) {
   const { username } = await params
+  if (username === 'support') return <SupportPage />
+
   const supabase = await createClient()
 
   const [profileRes, { data: { user } }] = await Promise.all([

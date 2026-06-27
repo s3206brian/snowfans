@@ -51,6 +51,7 @@ export type Database = {
           board_type?: 'snowboard' | 'ski' | 'both' | null
           years_experience?: number | null
           instructor_cert?: boolean
+          is_public?: boolean
           privacy_settings?: Json
         }
         Relationships: []
@@ -70,13 +71,17 @@ export type Database = {
           profile_id: string
           resort_id: string
           visited_at?: string | null
+          visited_end?: string | null
           notes?: string | null
+          snow_condition?: 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null
         }
         Update: {
           profile_id?: string
           resort_id?: string
           visited_at?: string | null
+          visited_end?: string | null
           notes?: string | null
+          snow_condition?: 'powder' | 'groomed' | 'icy' | 'wet' | 'variable' | null
         }
         Relationships: []
       }
@@ -130,6 +135,9 @@ export type Database = {
           model?: string | null
           year?: number | null
           notes?: string | null
+          image_urls?: string[]
+          for_sale?: boolean
+          sale_price?: number | null
           is_public?: boolean
         }
         Update: {
@@ -138,6 +146,9 @@ export type Database = {
           model?: string | null
           year?: number | null
           notes?: string | null
+          image_urls?: string[]
+          for_sale?: boolean
+          sale_price?: number | null
           is_public?: boolean
         }
         Relationships: []

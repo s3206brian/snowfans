@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { Avatar } from '@/components/ui/Avatar'
 import { TripStatusBadge } from '@/components/profile/TripStatusBadge'
 import { ResortFootprint } from '@/components/profile/ResortFootprint'
@@ -10,6 +11,9 @@ import { CopyButton } from '@/components/profile/CopyButton'
 import { PostList } from '@/components/profile/PostList'
 import { PostForm } from '@/components/profile/PostForm'
 import { SendMessageButton } from '@/components/profile/SendMessageButton'
+import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu'
+import { FollowButton } from '@/components/profile/FollowButton'
+import { getPrivacyLevel, canView } from '@/lib/utils/privacy'
 import type { TripStatus, ResortVisit, Resort, Tag, Trip, Post } from '@/lib/types'
 import SupportPage from '../support/page'
 
@@ -39,6 +43,27 @@ export default async function ProfilePage({ params }: Props) {
 
   const isOwner = user?.id === profile.id
 
+  const [followRes, followerCountRes, followingCountRes, blockedRes] = await Promise.all([
+    user && !isOwner
+      ? supabase.from('follows').select('follower_id').eq('follower_id', user.id).eq('following_id', profile.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', profile.id),
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', profile.id),
+    user && !isOwner
+      ? supabase.from('blocked_users').select('blocked_id').eq('blocker_id', user.id).eq('blocked_id', profile.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ])
+
+  const isFollower = !!followRes.data
+  const followerCount = followerCountRes.count ?? 0
+  const followingCount = followingCountRes.count ?? 0
+  const hasBlocked = !!blockedRes.data
+  const showTripStatus = canView(
+    getPrivacyLevel(profile.privacy_settings, 'trip_status'),
+    isOwner,
+    isFollower
+  )
+
   const [visitsRes, equipmentRes, tagsRes, tripsRes, resortsRes, postsRes] = await Promise.all([
     supabase.from('resort_visits').select('*, resort:resorts(*), visit_runs(osm_id, run_name, difficulty)').eq('profile_id', profile.id).order('visited_at', { ascending: false }),
     supabase.from('equipment').select('*').eq('profile_id', profile.id).order('created_at', { ascending: false }),
@@ -67,11 +92,23 @@ export default async function ProfilePage({ params }: Props) {
                 {profile.display_name ?? profile.username}
               </h1>
               {isOwner ? (
-                <a href="/settings" className="shrink-0 rounded-lg border border-slate-700 px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 transition-colors">
+                <Link href="/settings" className="shrink-0 rounded-lg border border-slate-700 px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 transition-colors">
                   編輯
-                </a>
+                </Link>
               ) : user && (
-                <SendMessageButton targetUserId={profile.id} />
+                <div className="flex items-center gap-1.5">
+                  {!hasBlocked && (
+                    <>
+                      <FollowButton targetUserId={profile.id} initiallyFollowing={isFollower} />
+                      <SendMessageButton targetUserId={profile.id} />
+                    </>
+                  )}
+                  <ProfileMoreMenu
+                    targetUserId={profile.id}
+                    targetName={profile.display_name ?? profile.username}
+                    initiallyBlocked={hasBlocked}
+                  />
+                </div>
               )}
             </div>
             <p className="text-sm text-slate-500">@{profile.username}</p>
@@ -82,11 +119,16 @@ export default async function ProfilePage({ params }: Props) {
                 {profile.instructor_cert ? ' · 教練資格' : ''}
               </p>
             )}
-            {profile.trip_status && (
+            {profile.trip_status && showTripStatus && (
               <div className="mt-1.5">
                 <TripStatusBadge status={profile.trip_status as TripStatus} />
               </div>
             )}
+            <p className="text-xs text-slate-500 mt-1.5">
+              <span className="text-slate-300 font-semibold">{followerCount}</span> 位追蹤者
+              <span className="mx-1.5">·</span>
+              追蹤 <span className="text-slate-300 font-semibold">{followingCount}</span> 人
+            </p>
           </div>
         </div>
 

@@ -25,6 +25,16 @@ export async function updateProfile(
   const is_public        = formData.get('is_public') !== 'off'
   const tag_ids          = formData.getAll('tag_ids') as string[]
 
+  const readLevel = (key: string) => {
+    const val = formData.get(key)
+    return val === 'public' || val === 'followers' || val === 'private' ? val : 'public'
+  }
+  const privacy_settings = {
+    resort_visits: readLevel('privacy_resort_visits'),
+    equipment: readLevel('privacy_equipment'),
+    trip_status: readLevel('privacy_trip_status'),
+  }
+
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -35,6 +45,7 @@ export async function updateProfile(
       years_experience,
       instructor_cert,
       is_public,
+      privacy_settings,
     })
     .eq('id', user.id)
 

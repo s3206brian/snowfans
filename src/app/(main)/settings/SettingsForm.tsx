@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { updateProfile, type ProfileState } from '@/app/actions/profile'
+import { getPrivacyLevel } from '@/lib/utils/privacy'
 import type { Profile, Tag } from '@/lib/types'
 
 type Props = {
@@ -23,6 +24,18 @@ const BOARD_TYPE_OPTIONS = [
   { value: 'snowboard', label: '單板 Snowboard' },
   { value: 'ski', label: '雙板 Ski' },
   { value: 'both', label: '單雙板都玩' },
+]
+
+const PRIVACY_SECTIONS = [
+  { key: 'resort_visits' as const, field: 'privacy_resort_visits', label: '雪場足跡' },
+  { key: 'equipment' as const,     field: 'privacy_equipment',     label: '裝備庫' },
+  { key: 'trip_status' as const,   field: 'privacy_trip_status',   label: '目前狀態' },
+]
+
+const PRIVACY_LEVEL_OPTIONS = [
+  { value: 'public',    label: '公開' },
+  { value: 'followers', label: '僅追蹤者' },
+  { value: 'private',   label: '私人' },
 ]
 
 const TAG_CATEGORY_LABEL: Record<Tag['category'], string> = {
@@ -172,6 +185,28 @@ export function SettingsForm({ profile, allTags, selectedTagIds, saved }: Props)
                   </label>
                 ))}
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Section privacy */}
+      <div>
+        <label className="block text-sm font-medium text-slate-300 mb-1">區塊隱私</label>
+        <p className="text-xs text-slate-600 mb-2">控制個人頁各區塊誰可以看到</p>
+        <div className="rounded-xl bg-slate-900 border border-slate-800 divide-y divide-slate-800">
+          {PRIVACY_SECTIONS.map(({ key, field, label }) => (
+            <div key={key} className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm text-white">{label}</span>
+              <select
+                name={field}
+                defaultValue={getPrivacyLevel(profile.privacy_settings, key)}
+                className="bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+              >
+                {PRIVACY_LEVEL_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
             </div>
           ))}
         </div>

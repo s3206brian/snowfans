@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 import { ProfilePreviewCard } from '@/components/explore/ProfilePreviewCard'
+import { getPrivacyLevel } from '@/lib/utils/privacy'
 import type { Profile, Tag, Trip, Resort } from '@/lib/types'
 
 export const metadata = { title: '探索雪友 | SnowFans' }
@@ -38,6 +40,27 @@ export default async function ExplorePage({ searchParams }: Props) {
   const supabase = await createClient()
   const activeTab = tab === 'trips' ? 'trips' : tab === 'gear' ? 'gear' : 'people'
 
+  // 搜尋雪場名／標籤名，找出符合的雪友
+  let matchedIds: string[] = []
+  if (q) {
+    const [tagMatches, resortMatches] = await Promise.all([
+      supabase
+        .from('profile_tags')
+        .select('profile_id, tags!inner(name)')
+        .ilike('tags.name', `%${q}%`)
+        .limit(200),
+      supabase
+        .from('resort_visits')
+        .select('profile_id, resorts!inner(name, name_zh)')
+        .or(`name.ilike.%${q}%,name_zh.ilike.%${q}%`, { referencedTable: 'resorts' })
+        .limit(200),
+    ])
+    matchedIds = [...new Set([
+      ...(tagMatches.data ?? []).map((r) => r.profile_id),
+      ...(resortMatches.data ?? []).map((r) => r.profile_id),
+    ])]
+  }
+
   // People query
   let query = supabase
     .from('profiles')
@@ -46,7 +69,12 @@ export default async function ExplorePage({ searchParams }: Props) {
     .order('created_at', { ascending: false })
     .limit(40)
 
-  if (q) query = query.or(`username.ilike.%${q}%,display_name.ilike.%${q}%,bio.ilike.%${q}%`)
+  if (q) {
+    const textFilter = `username.ilike.%${q}%,display_name.ilike.%${q}%,bio.ilike.%${q}%`
+    query = query.or(
+      matchedIds.length > 0 ? `${textFilter},id.in.(${matchedIds.join(',')})` : textFilter
+    )
+  }
   if (status) query = query.eq('trip_status', status as 'teaching' | 'learning' | 'finding_buddy')
 
   // Trips query
@@ -72,10 +100,18 @@ export default async function ExplorePage({ searchParams }: Props) {
   const [{ data: rows }, { data: tripsData }, { data: gearData }] = await Promise.all([query, tripsQuery, gearQuery])
 
   type ProfileRow = Profile & { profile_tags: { tag: Tag }[] }
-  const profiles: (Profile & { tags: Tag[] })[] = (rows ?? []).map((row: ProfileRow) => ({
-    ...row,
-    tags: row.profile_tags.map((pt) => pt.tag),
-  }))
+  const profiles: (Profile & { tags: Tag[] })[] = (rows ?? [])
+    .map((row: ProfileRow) => ({
+      ...row,
+      tags: row.profile_tags.map((pt) => pt.tag),
+    }))
+    // 目前狀態設為非公開的，探索頁不顯示（也不參與狀態篩選）
+    .map((p) =>
+      getPrivacyLevel(p.privacy_settings, 'trip_status') === 'public'
+        ? p
+        : { ...p, trip_status: null }
+    )
+    .filter((p) => !status || p.trip_status === status)
 
   type TripRow = Trip & { resort: Resort | null; profile: { id: string; username: string; display_name: string | null; avatar_url: string | null } }
   const trips = (tripsData ?? []) as TripRow[]
@@ -94,18 +130,18 @@ export default async function ExplorePage({ searchParams }: Props) {
 
       {/* Tabs */}
       <div className="flex gap-2 px-4 mb-4">
-        <a href={`/explore${q ? `?q=${encodeURIComponent(q)}` : ''}`}
+        <Link href={`/explore${q ? `?q=${encodeURIComponent(q)}` : ''}`}
           className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'people' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
           雪友
-        </a>
-        <a href="/explore?tab=trips"
+        </Link>
+        <Link href="/explore?tab=trips"
           className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'trips' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
           找行程
-        </a>
-        <a href="/explore?tab=gear"
+        </Link>
+        <Link href="/explore?tab=gear"
           className={`flex-1 text-center rounded-xl py-2 text-sm font-bold transition-colors border ${activeTab === 'gear' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}>
           找裝備
-        </a>
+        </Link>
       </div>
 
       {activeTab === 'people' && (
@@ -136,7 +172,7 @@ export default async function ExplorePage({ searchParams }: Props) {
               const isActive = (status ?? '') === value
               const href = `/explore${q ? `?q=${encodeURIComponent(q)}${value ? `&status=${value}` : ''}` : value ? `?status=${value}` : ''}`
               return (
-                <a key={value} href={href}
+                <Link key={value} href={href}
                   className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
                     isActive ? 'bg-blue-600 text-white border-blue-600'
                     : cls ? `${cls} hover:opacity-80`
@@ -144,7 +180,7 @@ export default async function ExplorePage({ searchParams }: Props) {
                   }`}
                 >
                   {label}
-                </a>
+                </Link>
               )
             })}
           </div>

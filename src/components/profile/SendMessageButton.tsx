@@ -10,8 +10,12 @@ export function SendMessageButton({ targetUserId }: { targetUserId: string }) {
 
   function handleClick() {
     startTransition(async () => {
-      const id = await getOrCreateConversation(targetUserId)
-      router.push(`/messages/${id}`)
+      try {
+        const id = await getOrCreateConversation(targetUserId)
+        router.push(`/messages/${id}`)
+      } catch {
+        alert('目前無法與此用戶對話')
+      }
     })
   }
 

@@ -7,38 +7,45 @@ export default async function MessagesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: convos } = await (supabase as any)
-    .from('conversations')
-    .select(`
-      id,
-      user_a,
-      user_b,
-      messages(body, created_at, sender_id, read_at)
-    `)
-    .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-    .order('created_at', { referencedTable: 'messages', ascending: false })
-    .limit(1, { referencedTable: 'messages' })
+  const [{ data: convos }, { data: blocked }] = await Promise.all([
+    supabase
+      .from('conversations')
+      .select(`
+        id,
+        user_a,
+        user_b,
+        messages(body, created_at, sender_id, read_at)
+      `)
+      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+      .order('created_at', { referencedTable: 'messages', ascending: false })
+      .limit(1, { referencedTable: 'messages' }),
+    supabase.from('blocked_users').select('blocked_id').eq('blocker_id', user.id),
+  ])
 
-  const otherIds = (convos ?? []).map((c: any) =>
-    c.user_a === user.id ? c.user_b : c.user_a
-  )
+  const blockedIds = new Set((blocked ?? []).map((b) => b.blocked_id))
+  const visibleConvos = (convos ?? []).filter((c) => {
+    const otherId = c.user_a === user.id ? c.user_b : c.user_a
+    return !blockedIds.has(otherId)
+  })
+
+  const otherIds = visibleConvos.map((c) => (c.user_a === user.id ? c.user_b : c.user_a))
 
   const { data: others } = otherIds.length > 0
     ? await supabase.from('profiles').select('id, username, display_name, avatar_url').in('id', otherIds)
     : { data: [] }
 
-  const othersMap = Object.fromEntries((others ?? []).map((p: any) => [p.id, p]))
+  const othersMap = Object.fromEntries((others ?? []).map((p) => [p.id, p]))
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-8 pb-20">
       <h1 className="text-2xl font-bold text-white mb-6">私訊</h1>
 
-      {(!convos || convos.length === 0) && (
+      {visibleConvos.length === 0 && (
         <p className="text-slate-500 text-center mt-20">還沒有對話，到探索大廳找雪友開始聊吧！</p>
       )}
 
       <div className="flex flex-col gap-2">
-        {(convos ?? []).map((c: any) => {
+        {visibleConvos.map((c) => {
           const otherId = c.user_a === user.id ? c.user_b : c.user_a
           const other = othersMap[otherId]
           const lastMsg = c.messages?.[0]

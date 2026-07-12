@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { sendMessage } from '@/app/actions/messages'
+import { createClient } from '@/lib/supabase/client'
+import { sendMessage, markMessagesRead } from '@/app/actions/messages'
+import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu'
 
 type Message = {
   id: string
@@ -17,33 +18,67 @@ type Props = {
   currentUserId: string
   other: { id: string; username: string; display_name: string | null } | null
   initialMessages: Message[]
+  initiallyBlocked?: boolean
 }
 
-export function ChatWindow({ conversationId, currentUserId, other, initialMessages }: Props) {
+export function ChatWindow({ conversationId, currentUserId, other, initialMessages, initiallyBlocked = false }: Props) {
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState('')
+  const [sendError, setSendError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const bottomRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // 即時接收對方訊息
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`messages-${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const m = payload.new as Message & { conversation_id: string }
+          if (m.sender_id === currentUserId) return
+          setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]))
+          markMessagesRead(conversationId)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [conversationId, currentUserId])
+
   function handleSend() {
     if (!input.trim() || pending) return
     const body = input.trim()
     setInput('')
-    // Optimistic update
+    setSendError(null)
+    const optimisticId = crypto.randomUUID()
     setMessages(prev => [...prev, {
-      id: crypto.randomUUID(),
+      id: optimisticId,
       sender_id: currentUserId,
       body,
       created_at: new Date().toISOString(),
     }])
     startTransition(async () => {
-      await sendMessage(conversationId, body)
-      router.refresh()
+      try {
+        await sendMessage(conversationId, body)
+      } catch {
+        setMessages(prev => prev.filter((m) => m.id !== optimisticId))
+        setInput(body)
+        setSendError('訊息傳送失敗，對方可能已封鎖你')
+      }
     })
   }
 
@@ -60,10 +95,19 @@ export function ChatWindow({ conversationId, currentUserId, other, initialMessag
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-blue-300 font-bold">
-          {(other?.display_name ?? other?.username ?? '?')[0].toUpperCase()}
-        </div>
-        <span className="text-white font-semibold">{other?.display_name ?? other?.username}</span>
+        <Link href={other ? `/${other.username}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-blue-300 font-bold shrink-0">
+            {(other?.display_name ?? other?.username ?? '?')[0].toUpperCase()}
+          </div>
+          <span className="text-white font-semibold truncate">{other?.display_name ?? other?.username}</span>
+        </Link>
+        {other && (
+          <ProfileMoreMenu
+            targetUserId={other.id}
+            targetName={other.display_name ?? other.username}
+            initiallyBlocked={initiallyBlocked}
+          />
+        )}
       </div>
 
       {/* Messages */}
@@ -89,23 +133,28 @@ export function ChatWindow({ conversationId, currentUserId, other, initialMessag
       </div>
 
       {/* Input */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-slate-950 border-t border-slate-800 pb-safe">
-        <input
-          className="flex-1 bg-slate-800 border border-slate-700 rounded-full px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
-          placeholder="輸入訊息..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() || pending}
-          className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center disabled:opacity-40 hover:bg-blue-500 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
-          </svg>
-        </button>
+      <div className="bg-slate-950 border-t border-slate-800 pb-safe">
+        {sendError && (
+          <p className="px-4 pt-2 text-xs text-rose-400">{sendError}</p>
+        )}
+        <div className="flex items-center gap-2 px-4 py-3">
+          <input
+            className="flex-1 bg-slate-800 border border-slate-700 rounded-full px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+            placeholder="輸入訊息..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={!input.trim() || pending}
+            className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center disabled:opacity-40 hover:bg-blue-500 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { updateProfile, type ProfileState } from '@/app/actions/profile'
 import { getPrivacyLevel } from '@/lib/utils/privacy'
+import { ACCOUNT_TYPES, type AccountType } from '@/lib/utils/accountTypes'
 import type { Profile, Tag } from '@/lib/types'
 
 type Props = {
@@ -67,6 +68,31 @@ export function SettingsForm({ profile, allTags, selectedTagIds, saved }: Props)
           {state.error}
         </div>
       )}
+
+      {/* Account type */}
+      <div>
+        <label className="block text-sm font-medium text-slate-300 mb-1">身分</label>
+        <p className="text-xs text-slate-600 mb-2">教練、滑雪學校與民宿會在名片與探索頁顯示身分徽章</p>
+        <div className="grid grid-cols-2 gap-2">
+          {(Object.keys(ACCOUNT_TYPES) as AccountType[]).map((value) => {
+            const { label, emoji } = ACCOUNT_TYPES[value]
+            return (
+              <label key={value} className="cursor-pointer">
+                <input
+                  type="radio"
+                  name="account_type"
+                  value={value}
+                  defaultChecked={(profile.account_type ?? 'skier') === value}
+                  className="sr-only peer"
+                />
+                <span className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 border-slate-700 text-slate-400">
+                  <span>{emoji}</span>{label}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+      </div>
 
       {/* Display name */}
       <div>

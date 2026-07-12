@@ -2,12 +2,13 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ProfilePreviewCard } from '@/components/explore/ProfilePreviewCard'
 import { getPrivacyLevel } from '@/lib/utils/privacy'
+import { ACCOUNT_TYPES, isAccountType, type AccountType } from '@/lib/utils/accountTypes'
 import type { Profile, Tag, Trip, Resort } from '@/lib/types'
 
-export const metadata = { title: '探索雪友 | SnowFans' }
+export const metadata = { title: '探索雪友' }
 
 type Props = {
-  searchParams: Promise<{ q?: string; status?: string; tab?: string }>
+  searchParams: Promise<{ q?: string; status?: string; tab?: string; type?: string }>
 }
 
 type GearRow = {
@@ -29,6 +30,15 @@ const STATUS_FILTERS = [
   { value: 'learning',      label: '我想學', cls: 'text-amber-400 border-amber-800/50 bg-amber-900/40' },
 ]
 
+function buildExploreHref(params: { q?: string | null; status?: string | null; type?: string | null }) {
+  const sp = new URLSearchParams()
+  if (params.q) sp.set('q', params.q)
+  if (params.status) sp.set('status', params.status)
+  if (params.type) sp.set('type', params.type)
+  const s = sp.toString()
+  return `/explore${s ? `?${s}` : ''}`
+}
+
 const TRIP_STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   teaching:      { label: '可教學', cls: 'bg-blue-900/40 text-blue-400 border-blue-800/50' },
   finding_buddy: { label: '找雪伴', cls: 'bg-emerald-900/40 text-emerald-400 border-emerald-800/50' },
@@ -36,9 +46,10 @@ const TRIP_STATUS_LABEL: Record<string, { label: string; cls: string }> = {
 }
 
 export default async function ExplorePage({ searchParams }: Props) {
-  const { q, status, tab } = await searchParams
+  const { q, status, tab, type } = await searchParams
   const supabase = await createClient()
   const activeTab = tab === 'trips' ? 'trips' : tab === 'gear' ? 'gear' : 'people'
+  const accountType = isAccountType(type) && type !== 'skier' ? type : null
 
   // 搜尋雪場名／標籤名，找出符合的雪友
   let matchedIds: string[] = []
@@ -76,6 +87,7 @@ export default async function ExplorePage({ searchParams }: Props) {
     )
   }
   if (status) query = query.eq('trip_status', status as 'teaching' | 'learning' | 'finding_buddy')
+  if (accountType) query = query.eq('account_type', accountType)
 
   // Trips query
   const today = new Date().toISOString().split('T')[0]
@@ -158,6 +170,7 @@ export default async function ExplorePage({ searchParams }: Props) {
           <div className="px-4 mb-4">
             <form method="GET" action="/explore">
               {status && <input type="hidden" name="status" value={status} />}
+              {accountType && <input type="hidden" name="type" value={accountType} />}
               <div className="relative">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   strokeWidth={2} className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500">
@@ -175,10 +188,10 @@ export default async function ExplorePage({ searchParams }: Props) {
           </div>
 
           {/* Status filters */}
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar px-4 pb-2 mb-6">
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar px-4 pb-2">
             {STATUS_FILTERS.map(({ value, label, cls }) => {
               const isActive = (status ?? '') === value
-              const href = `/explore${q ? `?q=${encodeURIComponent(q)}${value ? `&status=${value}` : ''}` : value ? `?status=${value}` : ''}`
+              const href = buildExploreHref({ q, status: value || null, type: accountType })
               return (
                 <Link key={value} href={href}
                   className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
@@ -193,10 +206,29 @@ export default async function ExplorePage({ searchParams }: Props) {
             })}
           </div>
 
+          {/* Account type filters */}
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar px-4 pb-2 mb-6">
+            {(['coach', 'school', 'lodging'] as AccountType[]).map((value) => {
+              const { label, emoji, badgeCls } = ACCOUNT_TYPES[value]
+              const isActive = accountType === value
+              // 點已選取的身分則取消篩選
+              const href = buildExploreHref({ q, status, type: isActive ? null : value })
+              return (
+                <Link key={value} href={href}
+                  className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
+                    isActive ? 'bg-blue-600 text-white border-blue-600' : `${badgeCls} hover:opacity-80`
+                  }`}
+                >
+                  {emoji} {label}
+                </Link>
+              )
+            })}
+          </div>
+
           <div className="px-4 mb-3">
             <p className="text-xs text-slate-500">
-              {q || status
-                ? `找到 ${profiles.length} 位雪友${q ? `，關鍵字「${q}」` : ''}${status ? `，篩選「${STATUS_FILTERS.find(f => f.value === status)?.label}」` : ''}`
+              {q || status || accountType
+                ? `找到 ${profiles.length} 位${accountType ? ACCOUNT_TYPES[accountType].label : '雪友'}${q ? `，關鍵字「${q}」` : ''}${status ? `，篩選「${STATUS_FILTERS.find(f => f.value === status)?.label}」` : ''}`
                 : '最新加入的雪友'}
             </p>
           </div>

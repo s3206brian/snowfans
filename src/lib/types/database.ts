@@ -26,6 +26,7 @@ export type Database = {
           is_public: boolean
           privacy_settings: Json
           eula_accepted_at: string | null
+          account_type: 'skier' | 'coach' | 'school' | 'lodging'
           created_at: string
           updated_at: string
         }
@@ -42,6 +43,7 @@ export type Database = {
           instructor_cert?: boolean
           privacy_settings?: Json
           eula_accepted_at?: string | null
+          account_type?: 'skier' | 'coach' | 'school' | 'lodging'
         }
         Update: {
           username?: string
@@ -56,6 +58,7 @@ export type Database = {
           is_public?: boolean
           privacy_settings?: Json
           eula_accepted_at?: string | null
+          account_type?: 'skier' | 'coach' | 'school' | 'lodging'
         }
         Relationships: []
       }

@@ -14,6 +14,7 @@ import { SendMessageButton } from '@/components/profile/SendMessageButton'
 import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu'
 import { FollowButton } from '@/components/profile/FollowButton'
 import { getPrivacyLevel, canView } from '@/lib/utils/privacy'
+import { accountBadge } from '@/lib/utils/accountTypes'
 import type { TripStatus, ResortVisit, Resort, Tag, Trip, Post } from '@/lib/types'
 import SupportPage from '../support/page'
 
@@ -111,7 +112,17 @@ export default async function ProfilePage({ params }: Props) {
                 </div>
               )}
             </div>
-            <p className="text-sm text-slate-500">@{profile.username}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-slate-500">@{profile.username}</p>
+              {(() => {
+                const badge = accountBadge(profile.account_type)
+                return badge ? (
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${badge.badgeCls}`}>
+                    {badge.emoji} {badge.label}
+                  </span>
+                ) : null
+              })()}
+            </div>
             {(profile.board_type || profile.years_experience) && (
               <p className="text-xs text-slate-500 mt-0.5">
                 {profile.board_type === 'snowboard' ? '單板' : profile.board_type === 'ski' ? '雙板' : profile.board_type === 'both' ? '單雙板' : ''}

@@ -1,27 +1,43 @@
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
 import { MarketingHeader } from '@/components/layout/MarketingHeader'
 import { MarketingFooter } from '@/components/layout/MarketingFooter'
+import { ProfilePreviewCard } from '@/components/explore/ProfilePreviewCard'
+import { getPrivacyLevel } from '@/lib/utils/privacy'
+import type { AccountType } from '@/lib/utils/accountTypes'
+import type { Profile, Tag } from '@/lib/types'
 
 export const metadata = {
   title: '教練・滑雪學校・民宿推廣 — 免費在 SnowFans 曝光',
   description: 'SnowFans 是非營利滑雪社群，教練、滑雪學校與雪場民宿都能免費建立名片，直接觸及正在找教學與住宿的雪友，零抽成、零廣告費。',
 }
 
-const AUDIENCES = [
+const AUDIENCES: {
+  type: AccountType
+  emoji: string
+  title: string
+  tagline: string
+  points: string[]
+  emptyNote: string
+  accent: string
+  badge: string
+}[] = [
   {
+    type: 'coach',
     emoji: '🎿',
     title: '滑雪教練',
     tagline: '讓正在找教練的雪友直接找到你',
     points: [
-      '標記教學狀態與可帶的行程，出現在「找教練」篩選中',
+      '設定「教練」身分，名片與探索頁都會顯示徽章',
       '展示證照、專長（單／雙板、Park、親子）與過往足跡',
       '雪友透過站內私訊直接聯繫，不經第三方',
     ],
-    cta: { label: '瀏覽現有教練', href: '/explore?status=teaching' },
+    emptyNote: '成為第一位在 SnowFans 上架的教練',
     accent: 'from-blue-500/15 to-blue-900/5 border-blue-800/50',
     badge: 'text-blue-400',
   },
   {
+    type: 'school',
     emoji: '🏫',
     title: '滑雪學校',
     tagline: '把課程與教練團隊介紹給更多新手',
@@ -30,11 +46,12 @@ const AUDIENCES = [
       '用標籤標註「新手友善」「中文教學」「親子課程」',
       '承接新手入門頁的流量，直接觸及第一次滑雪的族群',
     ],
-    cta: { label: '看新手怎麼找學校', href: '/start' },
+    emptyNote: '成為第一間在 SnowFans 上架的滑雪學校',
     accent: 'from-emerald-500/15 to-emerald-900/5 border-emerald-800/50',
     badge: 'text-emerald-400',
   },
   {
+    type: 'lodging',
     emoji: '🏠',
     title: '雪場民宿・住宿',
     tagline: '出現在雪友規劃行程的第一步',
@@ -43,7 +60,7 @@ const AUDIENCES = [
       '雪友在安排行程、找雪伴時順道發現你的住宿',
       '非營利平台不抽成，訂房與聯繫由雙方直接完成',
     ],
-    cta: { label: '探索雪友行程', href: '/explore?tab=trips' },
+    emptyNote: '成為第一間在 SnowFans 上架的雪場民宿',
     accent: 'from-violet-500/15 to-violet-900/5 border-violet-800/50',
     badge: 'text-violet-400',
   },
@@ -62,7 +79,43 @@ const HOW = [
   { n: '03', title: '開始曝光', desc: '雪友就能在探索大廳與新手入門頁找到你，直接私訊聯繫。' },
 ]
 
-export default function PartnersPage() {
+type ProfileWithTags = Profile & { tags: Tag[] }
+
+async function fetchByType(type: AccountType): Promise<ProfileWithTags[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('profiles')
+    .select('*, profile_tags(tag:tags(*))')
+    .eq('is_public', true)
+    .eq('account_type', type)
+    .order('created_at', { ascending: false })
+    .limit(4)
+
+  type Row = Profile & { profile_tags: { tag: Tag }[] }
+  return ((data ?? []) as Row[]).map((row) => ({
+    ...row,
+    tags: row.profile_tags.map((pt) => pt.tag),
+    // 尊重「目前狀態」隱私設定
+    trip_status:
+      getPrivacyLevel(row.privacy_settings, 'trip_status') === 'public'
+        ? row.trip_status
+        : null,
+  }))
+}
+
+export default async function PartnersPage() {
+  const [coaches, schools, lodgings] = await Promise.all([
+    fetchByType('coach'),
+    fetchByType('school'),
+    fetchByType('lodging'),
+  ])
+  const listings: Record<AccountType, ProfileWithTags[]> = {
+    skier: [],
+    coach: coaches,
+    school: schools,
+    lodging: lodgings,
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <MarketingHeader />
@@ -96,28 +149,48 @@ export default function PartnersPage() {
 
       {/* Audiences */}
       <section className="px-4 py-10 max-w-3xl mx-auto">
-        <div className="space-y-4">
-          {AUDIENCES.map((a) => (
-            <div key={a.title} className={`rounded-2xl border bg-gradient-to-b ${a.accent} p-6`}>
-              <div className="flex items-start gap-4">
-                <span className="text-4xl shrink-0">{a.emoji}</span>
-                <div className="flex-1">
-                  <h2 className={`text-xl font-bold ${a.badge}`}>{a.title}</h2>
-                  <p className="text-sm text-slate-300 mt-0.5">{a.tagline}</p>
-                  <ul className="mt-4 space-y-2">
-                    {a.points.map((p) => (
-                      <li key={p} className="text-sm text-slate-300 flex gap-2">
-                        <span className="text-slate-500 shrink-0">·</span>{p}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={a.cta.href} className="inline-block mt-4 text-sm font-semibold text-blue-400 hover:underline">
-                    {a.cta.label} →
-                  </Link>
+        <div className="space-y-6">
+          {AUDIENCES.map((a) => {
+            const profiles = listings[a.type]
+            return (
+              <div key={a.title}>
+                <div className={`rounded-2xl border bg-gradient-to-b ${a.accent} p-6`}>
+                  <div className="flex items-start gap-4">
+                    <span className="text-4xl shrink-0">{a.emoji}</span>
+                    <div className="flex-1">
+                      <h2 className={`text-xl font-bold ${a.badge}`}>{a.title}</h2>
+                      <p className="text-sm text-slate-300 mt-0.5">{a.tagline}</p>
+                      <ul className="mt-4 space-y-2">
+                        {a.points.map((p) => (
+                          <li key={p} className="text-sm text-slate-300 flex gap-2">
+                            <span className="text-slate-500 shrink-0">·</span>{p}
+                          </li>
+                        ))}
+                      </ul>
+                      {profiles.length > 0 ? (
+                        <Link href={`/explore?type=${a.type}`} className="inline-block mt-4 text-sm font-semibold text-blue-400 hover:underline">
+                          查看全部{a.title} →
+                        </Link>
+                      ) : (
+                        <p className="mt-4 text-sm text-slate-400">
+                          {a.emptyNote}——
+                          <Link href="/login" className="font-semibold text-blue-400 hover:underline">免費建立名片 →</Link>
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {profiles.length > 0 && (
+                  <div className="mt-3 grid sm:grid-cols-2 gap-3">
+                    {profiles.map((p) => (
+                      <ProfilePreviewCard key={p.id} profile={p} />
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 

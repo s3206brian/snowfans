@@ -58,7 +58,7 @@ cp .env.local.example .env.local
 ```
 
 Run all database migrations in your Supabase SQL Editor, in order:
-- `supabase/migrations/001_initial_schema.sql` … `supabase/migrations/011_follows_privacy_realtime.sql`
+- `supabase/migrations/001_initial_schema.sql` … `supabase/migrations/012_account_type.sql`
 
 ```bash
 npm run dev

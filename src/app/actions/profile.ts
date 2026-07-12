@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isAccountType } from '@/lib/utils/accountTypes'
 
 export type ProfileState = {
   error?: string
@@ -50,6 +51,16 @@ export async function updateProfile(
     .eq('id', user.id)
 
   if (error) return { error: '儲存失敗，請稍後再試' }
+
+  // account_type 獨立更新：容忍 012 migration 尚未執行的環境，
+  // 欄位不存在時只略過身分設定，不影響其他欄位儲存
+  const accountTypeRaw = formData.get('account_type')
+  if (isAccountType(accountTypeRaw)) {
+    await supabase
+      .from('profiles')
+      .update({ account_type: accountTypeRaw })
+      .eq('id', user.id)
+  }
 
   // Replace all profile tags
   await supabase.from('profile_tags').delete().eq('profile_id', user.id)

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Avatar } from '@/components/ui/Avatar'
+import { accountBadge } from '@/lib/utils/accountTypes'
 import type { Profile, Tag, TripStatus } from '@/lib/types'
 
 type Props = {
@@ -22,6 +23,7 @@ export function ProfilePreviewCard({ profile }: Props) {
   const status = profile.trip_status as TripStatus | null
   const name = profile.display_name ?? profile.username
   const coverGradient = status ? COVER_GRADIENT[status] : 'from-slate-800 to-slate-900'
+  const badge = accountBadge(profile.account_type)
 
   return (
     <Link
@@ -44,7 +46,14 @@ export function ProfilePreviewCard({ profile }: Props) {
 
       {/* Body */}
       <div className="px-4 pt-7 pb-4">
-        <h3 className="text-base font-bold text-white">{name}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-bold text-white">{name}</h3>
+          {badge && (
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badge.badgeCls}`}>
+              {badge.emoji} {badge.label}
+            </span>
+          )}
+        </div>
         <p className="text-slate-400 text-xs mt-0.5">@{profile.username}</p>
         {profile.bio && (
           <p className="text-slate-300 text-sm mt-2 line-clamp-2 leading-relaxed">{profile.bio}</p>

@@ -16,7 +16,9 @@ export function getPrivacyLevel(
   return 'public'
 }
 
-export function canView(level: PrivacyLevel, isOwner: boolean): boolean {
+export function canView(level: PrivacyLevel, isOwner: boolean, isFollower = false): boolean {
   if (isOwner) return true
-  return level === 'public'
+  if (level === 'public') return true
+  if (level === 'followers') return isFollower
+  return false
 }

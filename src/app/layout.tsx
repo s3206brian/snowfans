@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
     <html lang="zh-Hant" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
         {children}
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isValidUsername, safeUsername } from '@/lib/utils/reservedUsernames'
 
 export type AuthState = {
   error?: string
@@ -26,20 +27,27 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   if (data.user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, eula_accepted_at')
       .eq('id', data.user.id)
       .maybeSingle()
 
     if (!profile) {
       const emailPrefix = (data.user.email ?? '').split('@')[0]
-      const base = emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`
+      const base = safeUsername(emailPrefix.replace(/[^a-zA-Z0-9]/g, '') || `user${Date.now()}`)
       await supabase.from('profiles').insert({
         id: data.user.id,
         username: base,
         short_link: base.toLowerCase(),
         display_name: data.user.user_metadata?.full_name ?? emailPrefix,
         avatar_url: data.user.user_metadata?.avatar_url ?? null,
+        eula_accepted_at: new Date().toISOString(),
       })
+    } else if (!profile.eula_accepted_at) {
+      // 登入頁已顯示同意條款聲明，登入即代表同意
+      await supabase
+        .from('profiles')
+        .update({ eula_accepted_at: new Date().toISOString() })
+        .eq('id', data.user.id)
     }
   }
 
@@ -56,6 +64,9 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   }
   if (password.length < 8) {
     return { error: '密碼至少需要 8 個字元' }
+  }
+  if (username && !isValidUsername(username)) {
+    return { error: '使用者名稱限 3–30 個英數字或底線，且不可使用保留字' }
   }
 
   const supabase = await createClient()

@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
+import Link from 'next/link'
 import { signIn, signUp, type AuthState } from '@/app/actions/auth'
 import { createClient } from '@/lib/supabase/client'
 
@@ -106,6 +107,8 @@ export function LoginForm() {
             {signInPending ? '登入中...' : '登入'}
           </button>
         </form>
+
+        <AgreementNotice verb="登入" />
       </div>
     )
   }
@@ -209,7 +212,20 @@ export function LoginForm() {
           {signUpPending ? '建立中...' : '建立帳號'}
         </button>
       </form>
+
+      <AgreementNotice verb="註冊" />
     </div>
+  )
+}
+
+function AgreementNotice({ verb }: { verb: string }) {
+  return (
+    <p className="text-xs text-slate-600 text-center leading-relaxed">
+      {verb}即表示你同意 SnowFans 的
+      <Link href="/terms" className="text-slate-500 underline hover:text-slate-300">服務條款</Link>
+      與
+      <Link href="/privacy" className="text-slate-500 underline hover:text-slate-300">隱私權政策</Link>
+    </p>
   )
 }
 

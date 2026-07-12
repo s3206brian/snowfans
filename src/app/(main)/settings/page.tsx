@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { SettingsForm } from './SettingsForm'
 import { AvatarUpload } from '@/components/settings/AvatarUpload'
 import { signOut } from '@/app/actions/auth'
-import { deleteAccount } from '@/app/actions/profile'
+import { DeleteAccountButton } from './DeleteAccountButton'
 import type { Tag } from '@/lib/types'
 
 export const metadata = { title: '編輯個人資料' }
@@ -53,6 +54,15 @@ export default async function SettingsPage({ searchParams }: Props) {
       />
 
       <div className="mt-10 border-t border-slate-800 pt-6 space-y-3">
+        <Link
+          href="/settings/blocked"
+          className="flex items-center justify-between rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-900 transition-colors"
+        >
+          封鎖名單
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
         <form action={signOut}>
           <button
             type="submit"
@@ -65,17 +75,7 @@ export default async function SettingsPage({ searchParams }: Props) {
 
       <div className="mt-4 border-t border-red-900/30 pt-6">
         <p className="text-xs text-slate-600 mb-3 text-center">危險操作</p>
-        <form action={deleteAccount}>
-          <button
-            type="submit"
-            className="w-full rounded-xl border border-red-900/50 py-2.5 text-sm font-medium text-red-500 hover:bg-red-950/30 transition-colors"
-            onClick={(e) => {
-              if (!confirm('確定要永久刪除帳號嗎？此操作無法復原。')) e.preventDefault()
-            }}
-          >
-            刪除帳號
-          </button>
-        </form>
+        <DeleteAccountButton />
         <p className="text-xs text-slate-700 text-center mt-2">永久刪除帳號及所有相關資料</p>
       </div>
     </main>

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Trip, Resort } from '@/lib/types'
 
 type TripWithResort = Trip & { resort: Resort | null }
@@ -35,9 +36,9 @@ export function TripList({ trips, isOwner }: Props) {
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">行程</h2>
         <p className="text-sm text-slate-600">尚未建立任何行程</p>
         {isOwner && (
-          <a href="/trips/new" className="inline-block mt-2 text-xs text-blue-400 hover:underline">
+          <Link href="/trips/new" className="inline-block mt-2 text-xs text-blue-400 hover:underline">
             + 新增行程
-          </a>
+          </Link>
         )}
       </section>
     )
@@ -50,9 +51,9 @@ export function TripList({ trips, isOwner }: Props) {
           行程 · {trips.length} 筆
         </h2>
         {isOwner && (
-          <a href="/trips/new" className="text-xs text-blue-400 hover:underline">
+          <Link href="/trips/new" className="text-xs text-blue-400 hover:underline">
             + 新增
-          </a>
+          </Link>
         )}
       </div>
 
@@ -95,9 +96,14 @@ function TripCard({ trip, isOwner, isPast }: { trip: TripWithResort; isOwner?: b
           )}
         </div>
         {isOwner && (
-          <a href={`/trips/${trip.id}/delete`} className="shrink-0 text-slate-600 hover:text-rose-400 transition-colors text-xs">
-            刪除
-          </a>
+          <div className="shrink-0 flex items-center gap-2">
+            <Link href={`/trips/${trip.id}/edit`} className="text-slate-600 hover:text-blue-400 transition-colors text-xs">
+              編輯
+            </Link>
+            <Link href={`/trips/${trip.id}/delete`} className="text-slate-600 hover:text-rose-400 transition-colors text-xs">
+              刪除
+            </Link>
+          </div>
         )}
       </div>
     </div>

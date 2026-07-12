@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { signOut } from '@/app/actions/auth'
 
 export function FloatingMenu() {
@@ -10,14 +11,14 @@ export function FloatingMenu() {
     <div className="fixed bottom-20 left-4 z-50 flex flex-col items-start gap-2">
       {open && (
         <>
-          <a
+          <Link
             href="/"
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 rounded-full bg-slate-800 border border-slate-700 px-4 py-2 text-sm text-white shadow-lg hover:bg-slate-700 transition-colors"
           >
             <HomeIcon />
             首頁
-          </a>
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

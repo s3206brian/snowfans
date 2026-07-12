@@ -56,10 +56,11 @@ export function ResortMapInner({ lat, lon, runs, selectedIds, onToggle }: Props)
       mapRef.current = map
     })
 
+    const layers = layersRef.current
     return () => {
       mapRef.current?.remove()
       mapRef.current = null
-      layersRef.current.clear()
+      layers.clear()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

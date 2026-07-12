@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function SupportPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -68,7 +70,8 @@ export default function SupportPage() {
               <p className="text-slate-300">SnowFans 是一個開源的滑雪社群平台，讓雪友互相交流、尋找雪伴與教練。</p>
               <p className="text-slate-400 text-sm">版本：1.1 ｜ 開發者：SnowFans Team</p>
               <div className="flex gap-4 text-sm mt-2">
-                <a href="/privacy" className="text-blue-400 hover:underline">隱私政策</a>
+                <Link href="/privacy" className="text-blue-400 hover:underline">隱私政策</Link>
+                <Link href="/terms" className="text-blue-400 hover:underline">服務條款</Link>
               </div>
             </div>
           </section>

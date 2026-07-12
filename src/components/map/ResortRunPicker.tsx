@@ -31,17 +31,29 @@ export function ResortRunPicker({ lat, lon, onChange }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [tab, setTab] = useState<'map' | 'list'>('map')
 
-  useEffect(() => {
+  // 座標變更時在 render 期間重設載入狀態（避免在 effect 內同步 setState）
+  const [prevCoords, setPrevCoords] = useState({ lat, lon })
+  if (prevCoords.lat !== lat || prevCoords.lon !== lon) {
+    setPrevCoords({ lat, lon })
     setLoading(true)
     setError(null)
+  }
+
+  useEffect(() => {
+    let cancelled = false
     fetch(`/api/runs?lat=${lat}&lon=${lon}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error)
-        setRuns(data.runs ?? [])
+        if (!cancelled) setRuns(data.runs ?? [])
       })
-      .catch(() => setError('無法載入雪道資料'))
-      .finally(() => setLoading(false))
+      .catch(() => {
+        if (!cancelled) setError('無法載入雪道資料')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [lat, lon])
 
   const toggle = useCallback((run: SkiRun) => {

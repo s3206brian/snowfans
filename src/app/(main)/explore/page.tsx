@@ -126,6 +126,14 @@ export default async function ExplorePage({ searchParams }: Props) {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">神隊友</span>
         </h1>
         <p className="mt-2 text-slate-400 text-sm">搜尋雪場、找教練、約滑雪伴</p>
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs">
+          <Link href="/start" className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 font-semibold text-slate-300 hover:bg-slate-800 transition-colors">
+            🔰 新手入門
+          </Link>
+          <Link href="/partners" className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 font-semibold text-slate-300 hover:bg-slate-800 transition-colors">
+            🎿 教練・學校・民宿
+          </Link>
+        </div>
       </div>
 
       {/* Tabs */}

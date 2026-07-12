@@ -27,6 +27,10 @@ export default function HomePage() {
               探索大廳
             </Link>
           </div>
+          <p className="mt-6 text-sm text-slate-500">
+            第一次滑雪？
+            <Link href="/start" className="text-blue-400 hover:underline font-medium">看新手入門指南</Link>
+          </p>
         </div>
       </section>
 
@@ -94,6 +98,37 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Beginner + partners promo */}
+      <section className="px-4 py-16 max-w-lg mx-auto border-t border-slate-900">
+        <div className="grid gap-4">
+          <Link href="/start" className="group rounded-2xl border border-blue-800/50 bg-gradient-to-b from-blue-500/15 to-blue-900/5 p-6 hover:border-blue-600 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🔰</span>
+              <h3 className="text-lg font-bold text-white">滑雪新手入門</h3>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              單板還是雙板？要準備什麼？怎麼找教練和雪伴？新手最常卡住的問題一次搞懂。
+            </p>
+            <span className="inline-block mt-3 text-sm font-semibold text-blue-400 group-hover:underline">
+              開始入門 →
+            </span>
+          </Link>
+
+          <Link href="/partners" className="group rounded-2xl border border-emerald-800/50 bg-gradient-to-b from-emerald-500/15 to-emerald-900/5 p-6 hover:border-emerald-600 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🎿</span>
+              <h3 className="text-lg font-bold text-white">教練・滑雪學校・民宿</h3>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              是教練、滑雪學校或雪場民宿嗎？免費建立名片，直接觸及正在找教學與住宿的雪友，零抽成。
+            </p>
+            <span className="inline-block mt-3 text-sm font-semibold text-emerald-400 group-hover:underline">
+              免費上架推廣 →
+            </span>
+          </Link>
+        </div>
+      </section>
+
       {/* Footer CTA */}
       <section className="px-6 py-16 text-center bg-slate-900 border-t border-slate-800">
         <h2 className="text-2xl font-bold text-white">準備好了嗎？</h2>
@@ -104,8 +139,18 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-8 text-center text-xs text-slate-600">
-        © {new Date().getFullYear()} SnowFans · snowfans.org · Open Source · Non-profit
+      <footer className="px-6 py-8">
+        <div className="flex flex-wrap gap-x-5 gap-y-2 justify-center text-xs text-slate-500 mb-4">
+          <Link href="/start" className="hover:text-slate-300">新手入門</Link>
+          <Link href="/partners" className="hover:text-slate-300">教練・學校・住宿</Link>
+          <Link href="/explore" className="hover:text-slate-300">探索雪友</Link>
+          <Link href="/support" className="hover:text-slate-300">支援中心</Link>
+          <Link href="/privacy" className="hover:text-slate-300">隱私權政策</Link>
+          <Link href="/terms" className="hover:text-slate-300">服務條款</Link>
+        </div>
+        <p className="text-center text-xs text-slate-600">
+          © {new Date().getFullYear()} SnowFans · snowfans.org · Open Source · Non-profit
+        </p>
       </footer>
     </main>
   )

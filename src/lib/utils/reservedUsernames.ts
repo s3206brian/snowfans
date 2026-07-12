@@ -7,6 +7,8 @@ const RESERVED_USERNAMES = new Set([
   'mail', 'static', 'assets', 'public', 'profile', 'user', 'users',
   'search', 'notifications', 'follow', 'followers', 'following',
   'blocked', 'report', 'new', 'edit', 'delete',
+  'start', 'partners', 'guide', 'beginner', 'beginners',
+  'coach', 'coaches', 'school', 'schools', 'lodging', 'stay',
 ])
 
 export function isReservedUsername(username: string): boolean {

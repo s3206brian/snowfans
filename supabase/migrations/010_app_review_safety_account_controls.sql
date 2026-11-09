@@ -33,6 +33,18 @@ create table if not exists reports (
   resolved_at timestamptz
 );
 
+-- Older environments created a minimal reports / blocked_users table before this
+-- migration existed; bring them up to the expected shape.
+alter table reports
+  add column if not exists content_type text not null default 'profile',
+  add column if not exists content_id uuid,
+  add column if not exists details text,
+  add column if not exists status text not null default 'open',
+  add column if not exists resolved_at timestamptz;
+
+create unique index if not exists blocked_users_pair_uidx
+  on blocked_users(blocker_id, blocked_id);
+
 create index if not exists reports_reporter_id_idx on reports(reporter_id);
 create index if not exists reports_reported_id_idx on reports(reported_id);
 create index if not exists reports_status_created_at_idx on reports(status, created_at);

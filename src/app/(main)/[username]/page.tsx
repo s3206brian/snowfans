@@ -22,14 +22,23 @@ type Props = {
   params: Promise<{ username: string }>
 }
 
+// 動態路由參數會保留百分比編碼（中文、@ 等字元），查詢前先解碼
+function decodeUsername(raw: string): string {
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return raw
+  }
+}
+
 export async function generateMetadata({ params }: Props) {
-  const { username } = await params
+  const username = decodeUsername((await params).username)
   if (username === 'support') return { title: '支援中心' }
   return { title: `@${username}` }
 }
 
 export default async function ProfilePage({ params }: Props) {
-  const { username } = await params
+  const username = decodeUsername((await params).username)
   if (username === 'support') return <SupportPage />
 
   const supabase = await createClient()

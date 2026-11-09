@@ -5,7 +5,7 @@ import { isNativeApp, closeAuthBrowser, tapHaptic, NATIVE_AUTH_CALLBACK } from '
 
 /**
  * Runs only inside the iOS app:
- * - receives the OAuth redirect (org.snowfans.app://auth/callback?code=…) from the
+ * - receives the OAuth redirect (com.snowfansorg.snowfans://auth/callback?code=…) from the
  *   system browser and finishes sign-in on /auth/callback inside the WebView,
  *   where the PKCE verifier cookie lives
  * - light haptic feedback on bottom-nav taps

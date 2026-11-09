@@ -15,6 +15,9 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   if (!email || !password) {
     return { error: '請填寫電子郵件和密碼' }
   }
+  if (formData.get('eula') !== 'on') {
+    return { error: '請先勾選同意服務條款與隱私權政策' }
+  }
 
   const supabase = await createClient()
   const { error, data } = await supabase.auth.signInWithPassword({ email, password })
@@ -43,7 +46,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
         eula_accepted_at: new Date().toISOString(),
       })
     } else if (!profile.eula_accepted_at) {
-      // 登入頁已顯示同意條款聲明，登入即代表同意
+      // 使用者已在登入頁勾選同意服務條款
       await supabase
         .from('profiles')
         .update({ eula_accepted_at: new Date().toISOString() })
@@ -61,6 +64,9 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
 
   if (!email || !password) {
     return { error: '請填寫電子郵件和密碼' }
+  }
+  if (formData.get('eula') !== 'on') {
+    return { error: '請先勾選同意服務條款與隱私權政策' }
   }
   if (password.length < 8) {
     return { error: '密碼至少需要 8 個字元' }

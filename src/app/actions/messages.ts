@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { cleanText } from '@/lib/utils/contentFilter'
 import { revalidatePath } from 'next/cache'
 
 export async function getOrCreateConversation(otherUserId: string) {
@@ -44,7 +45,7 @@ export async function sendMessage(conversationId: string, body: string) {
 
   const { error } = await supabase
     .from('messages')
-    .insert({ conversation_id: conversationId, sender_id: user.id, body: body.trim() })
+    .insert({ conversation_id: conversationId, sender_id: user.id, body: cleanText(body.trim()) })
 
   if (error) throw new Error('訊息傳送失敗')
   revalidatePath(`/messages/${conversationId}`)

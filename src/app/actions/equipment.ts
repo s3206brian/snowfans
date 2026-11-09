@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { cleanText } from '@/lib/utils/contentFilter'
 
 export async function addEquipment(formData: FormData) {
   const supabase = await createClient()
@@ -9,10 +10,10 @@ export async function addEquipment(formData: FormData) {
   if (!user) return
 
   const category = formData.get('category') as string
-  const brand = (formData.get('brand') as string).trim() || null
-  const model = (formData.get('model') as string).trim() || null
+  const brand = cleanText((formData.get('brand') as string).trim() || null)
+  const model = cleanText((formData.get('model') as string).trim() || null)
   const year = parseInt(formData.get('year') as string) || null
-  const notes = (formData.get('notes') as string).trim() || null
+  const notes = cleanText((formData.get('notes') as string).trim() || null)
   const image_urls = formData.getAll('image_urls') as string[]
   const for_sale = formData.get('for_sale') === 'on'
   const sale_price = parseFloat(formData.get('sale_price') as string) || null
@@ -40,10 +41,10 @@ export async function updateEquipment(equipmentId: string, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const brand = (formData.get('brand') as string).trim() || null
-  const model = (formData.get('model') as string).trim() || null
+  const brand = cleanText((formData.get('brand') as string).trim() || null)
+  const model = cleanText((formData.get('model') as string).trim() || null)
   const year = parseInt(formData.get('year') as string) || null
-  const notes = (formData.get('notes') as string).trim() || null
+  const notes = cleanText((formData.get('notes') as string).trim() || null)
   const for_sale = formData.get('for_sale') === 'on'
   const sale_price = parseFloat(formData.get('sale_price') as string) || null
 

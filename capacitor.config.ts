@@ -10,7 +10,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
  * `src/lib/native.ts`, which no-ops in a normal browser.
  */
 const config: CapacitorConfig = {
-  appId: 'org.snowfans.app',
+  appId: 'com.snowfansorg.snowfans',
   appName: 'SnowFans',
   webDir: 'cap-shell',
   server: {

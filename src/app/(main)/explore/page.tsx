@@ -13,6 +13,7 @@ type Props = {
 
 type GearRow = {
   id: string
+  profile_id: string
   brand: string | null
   model: string | null
   category: string
@@ -50,6 +51,13 @@ export default async function ExplorePage({ searchParams }: Props) {
   const supabase = await createClient()
   const activeTab = tab === 'trips' ? 'trips' : tab === 'gear' ? 'gear' : 'people'
   const accountType = isAccountType(type) && type !== 'skier' ? type : null
+
+  // 封鎖的使用者立即從探索頁（雪友、行程、裝備）移除
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: blockedRows } = user
+    ? await supabase.from('blocked_users').select('blocked_id').eq('blocker_id', user.id)
+    : { data: [] as { blocked_id: string }[] }
+  const blockedIds = new Set((blockedRows ?? []).map((r) => r.blocked_id))
 
   // 搜尋雪場名／標籤名，找出符合的雪友
   let matchedIds: string[] = []
@@ -103,7 +111,7 @@ export default async function ExplorePage({ searchParams }: Props) {
   // Gear query
   const gearQuery = supabase
     .from('equipment')
-    .select('id, brand, model, category, year, notes, sale_price, image_urls, profile:profiles(username, display_name, avatar_url)')
+    .select('id, profile_id, brand, model, category, year, notes, sale_price, image_urls, profile:profiles(username, display_name, avatar_url)')
     .eq('for_sale', true)
     .eq('is_public', true)
     .order('created_at', { ascending: false })
@@ -124,10 +132,11 @@ export default async function ExplorePage({ searchParams }: Props) {
         : { ...p, trip_status: null }
     )
     .filter((p) => !status || p.trip_status === status)
+    .filter((p) => !blockedIds.has(p.id))
 
   type TripRow = Trip & { resort: Resort | null; profile: { id: string; username: string; display_name: string | null; avatar_url: string | null } }
-  const trips = (tripsData ?? []) as TripRow[]
-  const gear = (gearData ?? []) as GearRow[]
+  const trips = ((tripsData ?? []) as TripRow[]).filter((t) => !blockedIds.has(t.profile?.id))
+  const gear = ((gearData ?? []) as GearRow[]).filter((g) => !blockedIds.has(g.profile_id))
 
   return (
     <main className="min-h-screen max-w-lg mx-auto pb-20">

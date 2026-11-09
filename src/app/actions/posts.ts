@@ -2,14 +2,15 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { cleanText } from '@/lib/utils/contentFilter'
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const title = (formData.get('title') as string)?.trim() || null
-  const content = (formData.get('content') as string)?.trim() || null
+  const title = cleanText((formData.get('title') as string)?.trim() || null)
+  const content = cleanText((formData.get('content') as string)?.trim() || null)
   const resort_id = (formData.get('resort_id') as string) || null
   const image_urls = formData.getAll('image_urls') as string[]
 

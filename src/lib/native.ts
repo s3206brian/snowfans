@@ -7,7 +7,7 @@
 import { Capacitor } from '@capacitor/core'
 
 /** Custom URL scheme registered in ios/App/App/Info.plist (CFBundleURLTypes). */
-export const NATIVE_AUTH_CALLBACK = 'org.snowfans.app://auth/callback'
+export const NATIVE_AUTH_CALLBACK = 'com.snowfansorg.snowfans://auth/callback'
 
 export function isNativeApp(): boolean {
   return typeof window !== 'undefined' && Capacitor.isNativePlatform()

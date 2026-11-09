@@ -38,7 +38,7 @@ export async function GET(request: Request) {
           eula_accepted_at: new Date().toISOString(),
         })
       } else if (!profile.eula_accepted_at) {
-        // 登入頁已顯示同意條款聲明，登入即代表同意
+        // OAuth 按鈕需先勾選同意服務條款才能點擊
         await supabase
           .from('profiles')
           .update({ eula_accepted_at: new Date().toISOString() })

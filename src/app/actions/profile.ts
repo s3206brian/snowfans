@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { cleanText } from '@/lib/utils/contentFilter'
 import { isAccountType } from '@/lib/utils/accountTypes'
 
 export type ProfileState = {
@@ -17,8 +18,8 @@ export async function updateProfile(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: '請先登入' }
 
-  const display_name     = (formData.get('display_name') as string).trim() || null
-  const bio              = (formData.get('bio') as string).trim() || null
+  const display_name     = cleanText((formData.get('display_name') as string).trim() || null)
+  const bio              = cleanText((formData.get('bio') as string).trim() || null)
   const trip_status      = (formData.get('trip_status') as string) || null
   const board_type       = (formData.get('board_type') as string) || null
   const years_experience = parseInt(formData.get('years_experience') as string) || null

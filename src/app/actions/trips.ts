@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { cleanText } from '@/lib/utils/contentFilter'
 
 export type TripState = { error?: string }
 
@@ -10,11 +11,11 @@ export async function createTrip(_prev: TripState, formData: FormData): Promise<
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: '請先登入' }
 
-  const resort_name = (formData.get('resort_name') as string).trim() || null
+  const resort_name = cleanText((formData.get('resort_name') as string).trim() || null)
   const start_date  = formData.get('start_date') as string
   const end_date    = (formData.get('end_date') as string) || null
   const status      = formData.get('status') as 'teaching' | 'finding_buddy' | 'learning'
-  const description = (formData.get('description') as string).trim() || null
+  const description = cleanText((formData.get('description') as string).trim() || null)
 
   if (!start_date) return { error: '請填寫出發日期' }
   if (!status)     return { error: '請選擇行程狀態' }
@@ -49,11 +50,11 @@ export async function updateTrip(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: '請先登入' }
 
-  const resort_name = (formData.get('resort_name') as string).trim() || null
+  const resort_name = cleanText((formData.get('resort_name') as string).trim() || null)
   const start_date  = formData.get('start_date') as string
   const end_date    = (formData.get('end_date') as string) || null
   const status      = formData.get('status') as 'teaching' | 'finding_buddy' | 'learning'
-  const description = (formData.get('description') as string).trim() || null
+  const description = cleanText((formData.get('description') as string).trim() || null)
 
   if (!start_date) return { error: '請填寫出發日期' }
   if (!status)     return { error: '請選擇行程狀態' }

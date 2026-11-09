@@ -10,12 +10,15 @@ const initialState: AuthState = {}
 
 export function LoginForm() {
   const [tab, setTab] = useState<'login' | 'signup'>('login')
+  // Guideline 1.2：登入或註冊前須主動同意服務條款（EULA）
+  const [agreed, setAgreed] = useState(false)
   const [signInState, signInAction, signInPending] = useActionState(signIn, initialState)
   const [signUpState, signUpAction, signUpPending] = useActionState(signUp, initialState)
 
   const isPending = signInPending || signUpPending
 
   async function handleOAuthLogin(provider: 'google' | 'apple') {
+    if (!agreed) return
     const supabase = createClient()
     if (isNativeApp()) {
       // App 內：Google 不允許在 WebView 登入，改用系統瀏覽器，完成後經由 URL scheme 回到 App
@@ -42,13 +45,15 @@ export function LoginForm() {
     return (
       <div className="space-y-4">
         <TabSwitcher tab={tab} onChange={setTab} />
+        <EulaCheckbox checked={agreed} onChange={setAgreed} />
 
         {/* Social login */}
         <div className="space-y-2">
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+            disabled={!agreed}
+            className="disabled:opacity-40 disabled:cursor-not-allowed w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
           >
             <GoogleIcon />
             使用 Google 登入
@@ -56,7 +61,8 @@ export function LoginForm() {
           <button
             type="button"
             onClick={handleAppleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
+            disabled={!agreed}
+            className="disabled:opacity-40 disabled:cursor-not-allowed w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
           >
             <AppleIcon />
             使用 Apple 登入
@@ -70,6 +76,7 @@ export function LoginForm() {
         </div>
 
         <form action={signInAction} className="space-y-3">
+          <input type="hidden" name="eula" value={agreed ? 'on' : ''} />
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
               電子郵件
@@ -103,14 +110,13 @@ export function LoginForm() {
           )}
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !agreed}
             className="w-full rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-colors disabled:opacity-60"
           >
             {signInPending ? '登入中...' : '登入'}
           </button>
         </form>
 
-        <AgreementNotice verb="登入" />
       </div>
     )
   }
@@ -134,13 +140,15 @@ export function LoginForm() {
   return (
     <div className="space-y-4">
       <TabSwitcher tab={tab} onChange={setTab} />
+        <EulaCheckbox checked={agreed} onChange={setAgreed} />
 
       {/* Social login */}
       <div className="space-y-2">
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+          disabled={!agreed}
+          className="disabled:opacity-40 disabled:cursor-not-allowed w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
         >
           <GoogleIcon />
           使用 Google 註冊
@@ -148,7 +156,8 @@ export function LoginForm() {
         <button
           type="button"
           onClick={handleAppleLogin}
-          className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
+          disabled={!agreed}
+          className="disabled:opacity-40 disabled:cursor-not-allowed w-full flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-black py-2.5 text-sm font-medium text-white hover:bg-slate-900 transition-colors"
         >
           <AppleIcon />
           使用 Apple 註冊
@@ -162,6 +171,7 @@ export function LoginForm() {
       </div>
 
       <form action={signUpAction} className="space-y-3">
+        <input type="hidden" name="eula" value={agreed ? 'on' : ''} />
         <div>
           <label htmlFor="su-email" className="block text-sm font-medium text-slate-300 mb-1">
             電子郵件
@@ -208,26 +218,35 @@ export function LoginForm() {
         )}
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || !agreed}
           className="w-full rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-colors disabled:opacity-60"
         >
           {signUpPending ? '建立中...' : '建立帳號'}
         </button>
       </form>
 
-      <AgreementNotice verb="註冊" />
     </div>
   )
 }
 
-function AgreementNotice({ verb }: { verb: string }) {
+function EulaCheckbox({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <p className="text-xs text-slate-600 text-center leading-relaxed">
-      {verb}即表示你同意 SnowFans 的
-      <Link href="/terms" className="text-slate-500 underline hover:text-slate-300">服務條款</Link>
-      與
-      <Link href="/privacy" className="text-slate-500 underline hover:text-slate-300">隱私權政策</Link>
-    </p>
+    <label className="flex items-start gap-2.5 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-2.5 text-xs leading-relaxed text-slate-400">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600"
+        aria-describedby="eula-text"
+      />
+      <span id="eula-text">
+        我已閱讀並同意 SnowFans 的
+        <Link href="/terms" className="mx-0.5 text-slate-300 underline">服務條款（EULA）</Link>
+        與
+        <Link href="/privacy" className="mx-0.5 text-slate-300 underline">隱私權政策</Link>
+        。平台對不當內容與騷擾行為<strong className="text-slate-200">零容忍</strong>，違規內容將被移除、帳號將被停權。
+      </span>
+    </label>
   )
 }
 

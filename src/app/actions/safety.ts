@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { notifyModerators } from '@/lib/moderation'
+import { cleanText } from '@/lib/utils/contentFilter'
 
 export type ReportState = {
   error?: string
@@ -22,6 +24,18 @@ export async function blockUser(targetUserId: string): Promise<{ error?: string 
 
   // 23505 = 已封鎖過，視為成功
   if (error && error.code !== '23505') return { error: '封鎖失敗，請稍後再試' }
+
+  if (!error) {
+    // Guideline 1.2：封鎖同時通知開發者，建立一筆待審核紀錄
+    await supabase.from('reports').insert({
+      reporter_id: user.id,
+      reported_id: targetUserId,
+      content_type: 'profile',
+      reason: 'other',
+      details: '使用者封鎖了此帳號（自動建立，請審核此帳號內容）',
+    })
+    await notifyModerators(`🚫 封鎖通知：使用者 ${user.id} 封鎖了 ${targetUserId}，請於 24 小時內審核該帳號內容。`)
+  }
 
   revalidatePath('/messages')
   revalidatePath('/settings/blocked')
@@ -53,7 +67,7 @@ export async function reportUser(_prev: ReportState, formData: FormData): Promis
 
   const reported_id = (formData.get('reported_id') as string) || null
   const reason = formData.get('reason') as ReportReason | null
-  const details = (formData.get('details') as string | null)?.trim() || null
+  const details = cleanText((formData.get('details') as string | null)?.trim() || null)
   const content_type = ((formData.get('content_type') as string) || 'profile') as
     'profile' | 'trip' | 'equipment' | 'message'
 
@@ -70,5 +84,11 @@ export async function reportUser(_prev: ReportState, formData: FormData): Promis
   })
 
   if (error) return { error: '檢舉送出失敗，請稍後再試' }
+
+  await notifyModerators(
+    `⚠️ 新檢舉：${content_type} / ${reason}\n被檢舉者：${reported_id}\n檢舉者：${user.id}` +
+      (details ? `\n說明：${details}` : '') +
+      '\n請於 24 小時內處理（移除內容並停權違規帳號）。'
+  )
   return { success: true }
 }

@@ -79,22 +79,19 @@ export async function deleteAccount(): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  // Delete all user data
-  await Promise.all([
-    supabase.from('profile_tags').delete().eq('profile_id', user.id),
-    supabase.from('equipment').delete().eq('profile_id', user.id),
-    supabase.from('trips').delete().eq('profile_id', user.id),
-    supabase.from('messages').delete().eq('sender_id', user.id),
-  ])
-  await supabase.from('profiles').delete().eq('id', user.id)
+  // Guideline 5.1.1(v)：刪除 auth 使用者，profiles 及其關聯資料會一併 cascade 刪除。
+  // delete_current_user() 為 security definer 函式（migration 010），不需 service role key。
+  const { error } = await supabase.rpc('delete_current_user')
+  if (error) {
+    // 函式尚未部署時的備援：用 service role key 刪除
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceKey) throw new Error('帳號刪除失敗，請稍後再試或聯絡 support@snowfans.org')
+    await supabase.from('profiles').delete().eq('id', user.id)
+    const { createClient: createAdmin } = await import('@supabase/supabase-js')
+    const adminClient = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
+    await adminClient.auth.admin.deleteUser(user.id)
+  }
 
-  // Delete auth user using admin client
-  const { createClient: createAdmin } = await import('@supabase/supabase-js')
-  const adminClient = createAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-  await adminClient.auth.admin.deleteUser(user.id)
-
+  await supabase.auth.signOut()
   redirect('/login')
 }

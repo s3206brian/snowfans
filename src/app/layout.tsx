@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
+import { NativeBridge } from "@/components/pwa/NativeBridge";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
         {children}
         <ServiceWorkerRegistration />
+        <NativeBridge />
       </body>
     </html>
   );

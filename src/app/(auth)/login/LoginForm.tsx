@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { signIn, signUp, type AuthState } from '@/app/actions/auth'
 import { createClient } from '@/lib/supabase/client'
+import { isNativeApp, openAuthBrowser, NATIVE_AUTH_CALLBACK } from '@/lib/native'
 
 const initialState: AuthState = {}
 
@@ -14,27 +15,28 @@ export function LoginForm() {
 
   const isPending = signInPending || signUpPending
 
-  async function handleGoogleLogin() {
+  async function handleOAuthLogin(provider: 'google' | 'apple') {
     const supabase = createClient()
+    if (isNativeApp()) {
+      // App 內：Google 不允許在 WebView 登入，改用系統瀏覽器，完成後經由 URL scheme 回到 App
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: NATIVE_AUTH_CALLBACK, skipBrowserRedirect: true },
+      })
+      if (!error && data?.url) await openAuthBrowser(data.url)
+      return
+    }
     const base = process.env.NEXT_PUBLIC_APP_URL ?? location.origin
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: {
         redirectTo: `${base}/auth/callback`,
       },
     })
   }
 
-  async function handleAppleLogin() {
-    const supabase = createClient()
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? location.origin
-    await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${base}/auth/callback`,
-      },
-    })
-  }
+  const handleGoogleLogin = () => handleOAuthLogin('google')
+  const handleAppleLogin = () => handleOAuthLogin('apple')
 
   if (tab === 'login') {
     return (
